@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import yn from 'yn';
 
 const processWrapper = {
     PORT: process.env.PORT ?? 8443,
@@ -9,6 +10,9 @@ const processWrapper = {
     CONSUMERKEY: process.env.CONSUMERKEY,
     HUB_USERNAME: process.env.HUB_USERNAME,
     SFDX_PRERELEASE: process.env.SFDX_PRERELEASE,
+
+    // is functions enabled?
+    FUNCTIONS_READY: yn(process.env.FUNCTIONS_READY, {default: false}),
 
     // bring your own hub credentials
     BYOO_SECRET: process.env.BYOO_SECRET,

@@ -36,6 +36,12 @@ npm-debug.log
 # Environment settings
 .env
 
+# keys and certificates
+certificates/
+
+# Heroku local process config
+process.env
+
 # Generated files and dirs
 public
 
