@@ -91,8 +91,14 @@ const getAppNamesFromHerokuCDSs = async (
     return matched[0].herokuResults.map((result) => result.appName);
 };
 
+/**
+ * Gets the queue size for deletion in Redis
+ */
 const getDeleteQueueSize = async () => redis.llen(orgDeleteExchange);
 
+/**
+ * Grabs a deletion request off the redis queue
+ */
 const getDeleteRequest = async (): Promise<DeleteRequest> => {
     const msg = await redis.lpop(orgDeleteExchange);
     if (msg) {
