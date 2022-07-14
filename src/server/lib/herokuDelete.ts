@@ -3,6 +3,11 @@ import logger from 'heroku-logger';
 
 import { processWrapper } from '../lib/processWrapper';
 
+/**
+ * Deletes the Heroku app that was passed in
+ * @param appName Heroku app name
+ * @returns Response of deletion request
+ */
 const herokuDelete = async (appName: string) => {
     const headers = {
         Accept: 'application/vnd.heroku+json; version=3',

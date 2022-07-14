@@ -51,6 +51,16 @@ const getHerokuCDSs = async (): Promise<CDS[]> => {
     return CDSs;
 };
 
+ /**
+  * Searches for any Heroku apps logged in Redis that matches the 
+  * salesforceUsername and returns a list of app names
+  * 
+  * @param salesforceUsername - Username of the scratch org associated with the 
+  * Heroku app(s)
+  * @param expecting - Boolean indicating if we're expecting to find any Heroku
+  * apps
+  * @returns A list of Heroku app names associated
+  */ 
 const getAppNamesFromHerokuCDSs = async (
     salesforceUsername: string,
     expecting = true
