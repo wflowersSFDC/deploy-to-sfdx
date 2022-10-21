@@ -30,12 +30,16 @@ const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME): Prom
         processWrapper.CONSUMERKEY
     } --username ${username} --jwtkeyfile ${await getKeypath()}`;
 
+/**
+ * Authenticates to the production org for creating scratch orgs and set as default dev
+ * hub. If running in Heroku, this will install necessary sfdx plugins and 
+ */
+
 
 const buildFunctionsJWTAuthCommand = async (funcusername = processWrapper.HUB_USERNAME): Promise<string> =>
     `sfdx login:functions:jwt --clientid ${
         processWrapper.CONSUMERKEY
     } --username ${funcusername} --keyfile ${await getKeypath()}`;
-
 
 const auth = async (): Promise<string> => {
     // where will our cert live?
@@ -53,7 +57,7 @@ const auth = async (): Promise<string> => {
         }
 
         if (processWrapper.SFDX_PRERELEASE) {
-            // not local, so link the plugin.  local runs will hae it already linked.
+            // not local, so link the plugin.  local runs will have it already linked.
             logger.debug('hubAuth: installing pre-release plugin for sfdx');
             await exec('sfdx plugins:install salesforcedx@pre-release');
         }

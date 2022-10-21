@@ -2,7 +2,9 @@ import logger from 'heroku-logger';
 
 import { processDeleteQueue } from '../lib/skimmerSupport';
 import { auth } from '../lib/hubAuth';
-
+/**
+ * This kicks off the deletion of a scratch org
+ */
 (async () => {
     logger.debug('orgDeleter started');
     await auth();

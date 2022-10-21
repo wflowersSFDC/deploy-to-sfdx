@@ -150,7 +150,12 @@ const removeOldDeployIds = async (): Promise<void> =>
             stream.resume();
         });
     });
-
+/**
+ * Keeps the delete queue running, pulling requests off the queue and deleting
+ * the org in the request. To delete a scratch org, delete it off the 
+ * ActiveScratchOrg object in the prod org. Also deletes any Heroku apps
+ * associated with the scratch org 
+ */
 const processDeleteQueue = async (): Promise<void> => {
     const delQueueInitialSize = await getDeleteQueueSize();
 
