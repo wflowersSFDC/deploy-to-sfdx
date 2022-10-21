@@ -15,7 +15,7 @@ const utilities = {
         } else {
             logger.warn('no heroku api key. not running one-off dynos');
         }
-    },
+    }, 
 
     getPoolDeployerCommand: (): string => {
         if (processWrapper.HEROKU_API_KEY && processWrapper.HEROKU_APP_NAME && !isLocal()) {
