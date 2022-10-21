@@ -55,6 +55,7 @@ const requestBuildPool = async (testRepo: TestRepo, requireAuthable?: boolean) =
     expect(typeof poolOrg.instanceUrl).toBe('string');
     expect(typeof poolOrg.mainUser.username).toBe('string');
 
+    // TODO: Add in functions support?
     if (requireAuthable) {
         try {
             // we do this several times to increase the odds of the pool actually working...the first ones to get through sometimes doesn't hit on the findPooledOrg, but many times seems to be pretty sure.

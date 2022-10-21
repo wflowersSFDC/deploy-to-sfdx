@@ -34,6 +34,13 @@ const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME): Prom
  * Authenticates to the production org for creating scratch orgs and set as default dev
  * hub. If running in Heroku, this will install necessary sfdx plugins and 
  */
+
+
+const buildFunctionsJWTAuthCommand = async (funcusername = processWrapper.HUB_USERNAME): Promise<string> =>
+    `sfdx login:functions:jwt --clientid ${
+        processWrapper.CONSUMERKEY
+    } --username ${funcusername} --keyfile ${await getKeypath()}`;
+
 const auth = async (): Promise<string> => {
     // where will our cert live?
     const keypath = await getKeypath();
@@ -44,6 +51,7 @@ const auth = async (): Promise<string> => {
             logger.debug('hubAuth: updating plugin');
             await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
             await exec('sfdx plugins:link node_modules/@salesforce/analytics'); // analytics sfx plugins
+            await exec('sfdx plugins:link node_modules/plugin-functions');
             await exec('sfdx plugins:link node_modules/@mshanemc/sfdx-migration-automatic');
             await exec('sfdx plugins:link node_modules/sfdmu');
         }
@@ -59,6 +67,9 @@ const auth = async (): Promise<string> => {
         }
 
         await exec(`${await buildJWTAuthCommand()} --setdefaultdevhubusername -a hub --json`);
+        if (processWrapper.FUNCTIONS_READY) {
+            await exec(`${await buildFunctionsJWTAuthCommand()}`);
+        }
     } catch (err) {
         logger.error('hubAuth', err);
         // eslint-disable-next-line no-process-exit
@@ -68,4 +79,4 @@ const auth = async (): Promise<string> => {
     return keypath;
 };
 
-export { auth, getKeypath, buildJWTAuthCommand };
+export { auth, getKeypath, buildJWTAuthCommand, buildFunctionsJWTAuthCommand };

@@ -36,6 +36,12 @@ npm-debug.log
 # Environment settings
 .env
 
+# keys and certificates
+certificates/
+
+# Heroku local process config
+process.env
+
 # Generated files and dirs
 public
 
@@ -54,3 +60,20 @@ dist
 
 # specialized tests
 test/integrationTests/generatedRepos
+
+# vscode salesforce IDE items
+.sfdx
+
+# Chrome
+Backups/
+blob_storage/
+Cache/
+CachedData/
+CachedExtensions/
+Code\ Cache/
+Crashpad/
+GPUCache/
+Local\ Storage/
+User/
+Service\ Worker/
+Session\ Storage/

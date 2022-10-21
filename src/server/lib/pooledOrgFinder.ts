@@ -40,6 +40,7 @@ const pooledOrgFinder = async function (deployReq: DeployRequest, forcePool = fa
 
         const jwtComand = `${await buildJWTAuthCommand(cds.mainUser.username)} --instanceurl https://test.salesforce.com -s`;
 
+        // TODO: Add Functions support?
         if (forcePool) {
             await retry(async () => execProm(jwtComand, { cwd: uniquePath }), retryOptions);
         } else {

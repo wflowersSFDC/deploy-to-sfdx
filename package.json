@@ -43,6 +43,7 @@
         "@salesforce-ux/design-system": "^2.9.3",
         "@salesforce/analytics": "0.17.0",
         "@salesforce/kit": "^1.1.1",
+        "@salesforce/plugin-functions": "^0.2.29",
         "cors": "^2.8.5",
         "deepmerge": "^4.2.2",
         "express": "^4.16.4",
@@ -59,7 +60,8 @@
         "sfdmu": "^3.7.19",
         "shane-sfdx-plugins": "^4.43.0",
         "strip-color": "^0.1.0",
-        "universal-analytics": "^0.4.20"
+        "universal-analytics": "^0.4.20",
+        "yn": "^4.0.0"
     },
     "devDependencies": {
         "@babel/core": "^7.3.4",
