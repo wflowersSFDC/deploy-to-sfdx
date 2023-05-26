@@ -9,7 +9,7 @@
         "noUnusedLocals": true,
         "module": "commonjs",
         "resolveJsonModule": true,
-
+        "skipLibCheck": true,
         "removeComments": true,
         "types": ["node", "jest", "express", "ioredis", "fs-extra", "moment", "request-promise-native", "universal-analytics"]
     }
