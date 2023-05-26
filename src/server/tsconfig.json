@@ -3,6 +3,7 @@
         "outDir": "../../lib/server",
         "target": "es2019",
         "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "declaration": true,
         // "strict": true,
