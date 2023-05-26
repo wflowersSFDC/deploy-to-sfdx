@@ -38,6 +38,7 @@ const processWrapper = {
     // heroku integration stuff
     HEROKU_APP_NAME: process.env.HEROKU_APP_NAME,
     REDIS_URL: process.env.REDIS_URL,
+    REDIS_TLS_URL: process.env.REDIS_TLS_URL,
 
     HEROKU_API_KEY: process.env.HEROKU_API_KEY,
     DYNO_TIME_LIMIT: process.env.DYNO_TIME_LIMIT ? parseInt(process.env.DYNO_TIME_LIMIT) : 30,

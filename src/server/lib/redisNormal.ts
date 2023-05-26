@@ -24,7 +24,16 @@ const leadQueue = processWrapper.LEAD_QUEUE || 'leads';
 const days31asSeconds = 31 * 24 * 60 * 60;
 
 // for accessing the redis directly.  Less favored
-const redis = new Redis(processWrapper.REDIS_URL);
+const redisURL = processWrapper.REDIS_TLS_URL || processWrapper.REDIS_URL || "redis://localhost:6379"
+let redisOpts = {}
+if (redisURL.startsWith("rediss://")) {
+    redisOpts = {
+        tls: {
+            rejectUnauthorized: false
+        }
+    }
+}
+const redis = new Redis(redisURL, redisOpts);
 
 const deleteOrg = async (username: string): Promise<void> => {
     logger.debug(`org delete requested for ${username}`);
@@ -52,15 +61,15 @@ const getHerokuCDSs = async (): Promise<CDS[]> => {
 };
 
  /**
-  * Searches for any Heroku apps logged in Redis that matches the 
+  * Searches for any Heroku apps logged in Redis that matches the
   * salesforceUsername and returns a list of app names
-  * 
-  * @param salesforceUsername - Username of the scratch org associated with the 
+  *
+  * @param salesforceUsername - Username of the scratch org associated with the
   * Heroku app(s)
   * @param expecting - Boolean indicating if we're expecting to find any Heroku
   * apps
   * @returns A list of Heroku app names associated
-  */ 
+  */
 const getAppNamesFromHerokuCDSs = async (
     salesforceUsername: string,
     expecting = true
