@@ -2,7 +2,7 @@
     "name": "deploy-to-sfdx",
     "version": "0.0.1",
     "description": "An application that will deploy an SFDX project from a public  Github repo",
-    "main": "src/lib/processes/web.ts",
+    "main": "lib/processes/web.js",
     "scripts": {
         "build": "yarn build:client && yarn build:server",
         "build:server": "tsc -b ./src/server",
