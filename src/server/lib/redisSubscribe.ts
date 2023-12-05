@@ -6,7 +6,8 @@ let redisOpts = {}
 if (redisURL.startsWith("rediss://")) {
     redisOpts = {
         tls: {
-            rejectUnauthorized: false
+            rejectUnauthorized: false,
+            requestCert: true
         }
     }
 }
