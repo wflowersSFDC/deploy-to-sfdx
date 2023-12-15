@@ -29,8 +29,7 @@ let redisOpts = {}
 if (redisURL.startsWith("rediss://")) {
     redisOpts = {
         tls: {
-            rejectUnauthorized: false,
-            requestCert: true
+            rejectUnauthorized: false
         }
     }
 }
