@@ -31,14 +31,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com/mshanemc/deploy-to-sfdx.git"
+        "url": "git+ssh://git@github.com/SFDC-Assets/deploy-to-sfdx.git"
     },
     "author": "Shane McLaughlin",
     "license": "Apache-2.0",
     "bugs": {
         "url": "https://github.com/mshanemc/deploy-to-sfdx/issues"
     },
-    "homepage": "https://github.com/mshanemc/deploy-to-sfdx#readme",
+    "homepage": "https://github.com/SFDC-Assets/deploy-to-sfdx#readme",
     "dependencies": {
         "@lifeomic/attempt": "^3.0.0",
         "@mshanemc/lwc-oss-base": "^1.1.1",
