@@ -4,28 +4,28 @@ import { commandSummary } from './CDS';
 import { processWrapper } from './processWrapper';
 
 export const getSummary = (localLine: string, msgJSON: DeployRequest): commandSummary => {
-    if (localLine.includes('sfdx force:org:open')) {
+    if (localLine.includes('sfdx force:org:open') || localLine.includes('sf org open')) {
         return commandSummary.OPEN;
         // localLine = `${localLine} -r`;
-    } else if (localLine.includes(':user:password')) {
+    } else if (localLine.includes(':user:password') || localLine.includes('user password')) {
         return commandSummary.PASSWORD_GEN;
-    } else if (localLine.includes(':org:create')) {
+    } else if (localLine.includes(':org:create') || localLine.includes('org create')) {
         // handle the shane plugin and the stock commmand
         // no aliases allowed to keep the deployer from getting confused between deployments
         // localLine = argStripper(localLine, '--setalias');
         // localLine = argStripper(localLine, '-a');
         return commandSummary.ORG_CREATE;
-    } else if (localLine.includes('sfdx force:source:push')) {
+    } else if (localLine.includes('sfdx force:source:push') || localLine.includes('sf project deploy start')) {
         return commandSummary.PUSH;
-    } else if (localLine.includes('sfdx force:user:create')) {
+    } else if (localLine.includes('sfdx force:user:create') || localLine.includes('sf org create user')) {
         return commandSummary.USER_CREATE;
-    } else if (localLine.includes('sfdx force:apex:execute')) {
+    } else if (localLine.includes('sfdx force:apex:execute') || localLine.includes('sf apex run')) {
         return commandSummary.APEX_EXEC;
-    } else if (localLine.includes('sfdx force:user:permset')) {
+    } else if (localLine.includes('sfdx force:user:permset') || localLine.includes('sf force user permset')) {
         return commandSummary.PERMSET;
-    } else if (localLine.includes('sfdx force:data:') || localLine.includes('sfdx automig:load')) {
+    } else if (localLine.includes('sfdx force:data:') || localLine.includes('sfdx automig:load') || localLine.includes('sf automig load')) {
         return commandSummary.DATA;
-    } else if (localLine.includes(':package:install')) {
+    } else if (localLine.includes(':package:install') || localLine.includes('sf package install')) {
         return commandSummary.PACKAGE;
     } else if (localLine.includes('sfdx force:mdapi:deploy')) {
         return commandSummary.DEPLOY;
