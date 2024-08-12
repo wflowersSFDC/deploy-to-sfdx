@@ -21,7 +21,7 @@ export const getSummary = (localLine: string, msgJSON: DeployRequest): commandSu
         return commandSummary.USER_CREATE;
     } else if (localLine.includes('sfdx force:apex:execute') || localLine.includes('sf apex run')) {
         return commandSummary.APEX_EXEC;
-    } else if (localLine.includes('sfdx force:user:permset') || localLine.includes('sf force user permset')) {
+    } else if (localLine.includes('sfdx force:user:permset') || localLine.includes('sf org user permset')) {
         return commandSummary.PERMSET;
     } else if (localLine.includes('sfdx force:data:') || localLine.includes('sfdx automig:load') || localLine.includes('sf automig load')) {
         return commandSummary.DATA;
