@@ -34,7 +34,7 @@ const securityAssertions = (line: string): string => {
             `ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`
         );
     }
-    if (!line.startsWith('sfdx ')) {
+    if (!(line.startsWith('sfdx ') || line.startsWith('sf '))) {
         throw new Error(
             `ERROR: Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`
         );
