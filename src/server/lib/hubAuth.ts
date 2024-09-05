@@ -51,7 +51,7 @@ const auth = async (): Promise<string> => {
             logger.debug('hubAuth: updating plugin');
             await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
             await exec('sfdx plugins:link node_modules/@salesforce/analytics'); // analytics sfx plugins
-            await exec('sfdx plugins:link node_modules/plugin-functions');
+            // await exec('sfdx plugins:link node_modules/plugin-functions');
             await exec('sfdx plugins:link node_modules/@mshanemc/sfdx-migration-automatic');
             await exec('sfdx plugins:link node_modules/sfdmu');
         }
