@@ -56,10 +56,10 @@ const securityAssertions = (line: string): string => {
 // corrections and improvements for individual commands, always runs
 const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
     // we ALWAYS want -r instead of real open on our server
-    if (line.includes('sfdx force:org:open') && !line.includes(' -r')) {
+    if ((line.includes('sfdx force:org:open') || line.includes('sf org open')) && !line.includes(' -r')) {
         return `${line} -r`;
     }
-    if (line.includes(':org:create')) {
+    if (line.includes(':org:create') || line.includes('org create')) {
         // console.log(`line reached corrections for create:  it is ${line}`);
         // handle the shane plugin and the stock commmand
         // no aliases allowed to keep the deployer from getting confused between deployments
