@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import logger from 'heroku-logger';
 import { exec, ExecOptions } from 'child_process';
 import stripColor from 'strip-color';
 import * as util from 'util';
