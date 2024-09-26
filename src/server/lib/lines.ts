@@ -49,6 +49,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
         cdsPublish(output);
 
         const summary = getSummary(localLine, msgJSON);
+        logger.debug(`line summary-- ${summary}`);
 
         const commandResult: ClientResult = {
             commandStartTimestamp: new Date(),
