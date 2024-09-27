@@ -10,7 +10,7 @@ import { isMultiRepo, isByoo, getPackageDirsFromFile, getArg } from './namedUtil
 import { filesToLines } from './fileToLines';
 
 const jsonify = (line: string): string => {
-    if (line.startsWith('sfdx ')) {
+    if (line.startsWith('sfdx ') || line.startsWith('sf ')) {
         // TODO: handling for & at the end of line for background runs
         return `${argStripper(line, '--json', true)} --json`;
     } else {
@@ -19,10 +19,10 @@ const jsonify = (line: string): string => {
 };
 
 const byooFilter = (line: string): boolean => {
-    if (line.includes('org:create')) {
+    if (line.includes('org:create') || line.includes('org create')) {
         return false;
     }
-    if (line.includes('user:password')) {
+    if (line.includes('user:password') || line.includes('user password')) {
         return false;
     }
     return true;

@@ -54,6 +54,7 @@ const auth = async (): Promise<string> => {
             // await exec('sfdx plugins:link node_modules/plugin-functions');
             await exec('sfdx plugins:link node_modules/@mshanemc/sfdx-migration-automatic');
             await exec('sfdx plugins:link node_modules/sfdmu');
+            await exec('sfdx plugins:link node_modules/sf-demo-utils');
         }
 
         if (processWrapper.SFDX_PRERELEASE) {
