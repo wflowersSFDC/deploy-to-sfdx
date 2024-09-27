@@ -124,10 +124,12 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
             } else {
 
                 logger.debug(`ojibowa non-json-try`);
+                const rawResult = await exec2String(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
+                logger.debug(`ojibowa resulto-- ${rawResult}`);
                 // run with string output only
                 output.commandResults.push({
                     command: localLine,
-                    raw: await exec2String(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' })
+                    raw: rawResult
                 });
             }
 
