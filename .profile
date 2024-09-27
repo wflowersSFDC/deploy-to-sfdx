@@ -11,7 +11,7 @@ export SF_AUTOUPDATE_DISABLE=true
 export SF_JSON_TO_STDOUT=true
 
 echo ".Profile: Creating local resources ..."
-mkdir /app/dist/tmp
-mkdir /app/tmp
+# mkdir /app/dist/tmp
+# mkdir /app/tmp
 
 echo ".Profile: Completed!"

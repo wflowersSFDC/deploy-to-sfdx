@@ -22,7 +22,7 @@ const exec2JSON = async (cmd: string, options?: ExecOptions): Promise<any> => {
 const exec2String = async (cmd: string, options?: ExecOptions): Promise<any> => {
     try {
         const results = await execProm(cmd, { maxBuffer, ...options });
-        logger.debug('results-- ${results.stdout}')
+        logger.debug(`results-- ${results.stdout}`);
         return results.stdout;
     } catch (err) {
         // console.log(err);
