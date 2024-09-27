@@ -64,8 +64,6 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                 let response = await exec2JSON(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
                 // returned a reasonable error but not a full-on throw
 
-                logger.debug(`ojibowa json-try-- ${response}`);
-
                 if (response.status !== 0) {
                     // you fail!
                     output.errors.push({
@@ -122,10 +120,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                     commandCompleteTimestamp: new Date()
                 });
             } else {
-
-                logger.debug(`ojibowa non-json-try`);
                 const rawResult = await exec2String(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
-                logger.debug(`ojibowa resulto-- ${rawResult}`);
                 // run with string output only
                 output.commandResults.push({
                     command: localLine,
