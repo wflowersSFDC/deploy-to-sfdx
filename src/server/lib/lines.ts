@@ -59,8 +59,6 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
 
         try {
             if (localLine.includes('--json')) {
-                // lineResult =
-
                 let response = await exec2JSON(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
                 // returned a reasonable error but not a full-on throw
 

@@ -9,19 +9,9 @@ const maxBuffer = 1024 * 3000;
 
 // tslint:disable-next-line: no-any
 const exec2JSON = async (cmd: string, options?: ExecOptions): Promise<any> => {
-    const fakeResults = {
-        'status': 0,
-        'results': 'Successfully loaded data'
-    };
-
     try {
-        if (cmd.includes('sfdx automig:load') || cmd.includes('sf automig load') || cmd.includes('sf data upsert') || cmd.includes('sfdx force:data:bulk:upsert')) {
-            await execProm(cmd, { stdio: 'ignore', ...options });
-            return fakeResults;
-        } else {
-            const results = await execProm(cmd, { maxBuffer, ...options });
-            return JSON.parse(JSON.stringify(stripColor(results.stdout.toString())));
-        }
+        const results = await execProm(cmd, { -1, ...options });
+        return JSON.parse(JSON.stringify(stripColor(results.stdout.toString())));
     } catch (err) {
         console.log(err);
         return JSON.parse(stripColor(err.stdout));
