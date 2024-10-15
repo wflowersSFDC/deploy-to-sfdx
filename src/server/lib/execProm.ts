@@ -15,13 +15,13 @@ const exec2JSON = async (cmd: string, options?: ExecOptions): Promise<any> => {
     };
 
     try {
-        const results = await execProm(cmd, { maxBuffer, ...options });
         if (cmd.includes('sfdx automig:load') || cmd.includes('sf automig load') || cmd.includes('sf data upsert') || cmd.includes('sfdx force:data:bulk:upsert')) {
-            // if the script didn't supply the concise line, make sure it's there.
+            const results = await execProm(cmd, { stdio: 'ignore', ...options });
             return fakeResults;
+        } else {
+            const results = await execProm(cmd, { maxBuffer, ...options });
+            return JSON.parse(JSON.stringify(stripColor(results.stdout.toString())));
         }
-
-        return JSON.parse(JSON.stringify(stripColor(results.stdout.toString())));
     } catch (err) {
         console.log(err);
         return JSON.parse(stripColor(err.stdout));
