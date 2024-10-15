@@ -70,7 +70,7 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
         line = argStripper(line, '-v');
         return line;
     }
-    if (isByoo(msgJSON) && (line.includes('sfdx force:user:permset:assign') || line.includes('sf org assign permset')) {
+    if (isByoo(msgJSON) && (line.includes('sfdx force:user:permset:assign') || line.includes('sf org assign permset'))) {
         // the username on byoo deploys is a accesstoken, which confuses the standard permset assign command
         return line.replace('force:user', 'shane:user');
     }
@@ -78,7 +78,7 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
     //     // if the script didn't supply the concise line, make sure it's there.
     //     return `${argStripper(line, '--concise', true)} --concise`;
     // }
-    if (isByoo(msgJSON) && (line.includes('sfdx force:source:push') || line.includes('sf project deploy start')) {
+    if (isByoo(msgJSON) && (line.includes('sfdx force:source:push') || line.includes('sf project deploy start'))) {
         const project = fs.readJSONSync(`tmp/${msgJSON.deployId}/sfdx-project.json`);
         // byoo might not be a scratch org, so we'll deploy it using deploy instead of push, referencing the project directories
         return line.replace(
