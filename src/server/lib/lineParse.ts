@@ -70,15 +70,15 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
         line = argStripper(line, '-v');
         return line;
     }
-    if (isByoo(msgJSON) && line.includes('sfdx force:user:permset:assign')) {
+    if (isByoo(msgJSON) && (line.includes('sfdx force:user:permset:assign') || line.includes('sf org assign permset')) {
         // the username on byoo deploys is a accesstoken, which confuses the standard permset assign command
         return line.replace('force:user', 'shane:user');
     }
-    if (line.includes('sfdx automig:load')) {
-        // if the script didn't supply the concise line, make sure it's there.
-        return `${argStripper(line, '--concise', true)} --concise`;
-    }
-    if (isByoo(msgJSON) && line.includes('sfdx force:source:push')) {
+    // if (line.includes('sfdx automig:load') || line.includes('sf automig load')) {
+    //     // if the script didn't supply the concise line, make sure it's there.
+    //     return `${argStripper(line, '--concise', true)} --concise`;
+    // }
+    if (isByoo(msgJSON) && (line.includes('sfdx force:source:push') || line.includes('sf project deploy start')) {
         const project = fs.readJSONSync(`tmp/${msgJSON.deployId}/sfdx-project.json`);
         // byoo might not be a scratch org, so we'll deploy it using deploy instead of push, referencing the project directories
         return line.replace(
@@ -86,6 +86,16 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
             `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`
         );
     }
+
+    if (isByoo(msgJSON) && line.includes('sf project deploy start')) {
+        const project = fs.readJSONSync(`tmp/${msgJSON.deployId}/sfdx-project.json`);
+        // byoo might not be a scratch org, so we'll deploy it using deploy instead of push, referencing the project directories
+        return line.replace(
+            'sf project deploy start',
+            `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`
+        );
+    }
+
 
     return line;
 };
@@ -106,11 +116,11 @@ const thereCanBeOnlyOne = (lines: string[], textSoSearchFor: string) => {
 
 const multiOrgCorrections = (lines: string[]): string[] =>
     // only one password allowed for (multi org).  [BYOO will have them already removed at this stage]
-    thereCanBeOnlyOne(lines, 'user:password');
+    thereCanBeOnlyOne(lines, 'user password');
 const getMaxDays = (lines: string[]): number =>
     Math.max(
         ...lines
-            .filter((line) => line.includes('org:create'))
+            .filter((line) => (line.includes('org:create') || line.includes('org create')))
             .map(
                 (line) =>
                     parseInt(getArg(line, '-d'), 10) || parseInt(getArg(line, '--days'), 10) || 7
@@ -137,17 +147,17 @@ const lineParse = async (msgJSON: DeployRequest): Promise<string[]> => {
     if (isByoo(msgJSON)) {
         // special auth scenario for byoo user
         parsedLines.unshift(
-            `sfdx force:config:set defaultdevhubusername= defaultusername='${msgJSON.byoo.accessToken}' instanceUrl='${msgJSON.byoo.instanceUrl}' --json`
+            `sf config set defaultdevhubusername= defaultusername='${msgJSON.byoo.accessToken}' instanceUrl='${msgJSON.byoo.instanceUrl}' --json`
         );
     }
 
     if (!isByoo(msgJSON) && isMultiRepo(msgJSON)) {
         // remove all the creates and put it at the beginning
         parsedLines = [
-            `sfdx force:org:create -f config/project-scratch-def.json -d ${getMaxDays(
+            `sf org create scratch -f config/project-scratch-def.json -d ${getMaxDays(
                 parsedLines
             )} -s --json`,
-            ...parsedLines.filter((line) => !line.includes('org:create'))
+            ...parsedLines.filter((line) => !line.includes('org create'))
         ];
     }
 
