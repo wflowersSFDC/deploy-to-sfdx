@@ -16,7 +16,7 @@ const exec2JSON = async (cmd: string, options?: ExecOptions): Promise<any> => {
 
     try {
         if (cmd.includes('sfdx automig:load') || cmd.includes('sf automig load') || cmd.includes('sf data upsert') || cmd.includes('sfdx force:data:bulk:upsert')) {
-            const results = await execProm(cmd, { stdio: 'ignore', ...options });
+            await execProm(cmd, { stdio: 'ignore', ...options });
             return fakeResults;
         } else {
             const results = await execProm(cmd, { maxBuffer, ...options });
