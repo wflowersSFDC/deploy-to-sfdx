@@ -5,7 +5,7 @@ import stripColor from 'strip-color';
 import * as util from 'util';
 
 const execProm = util.promisify(exec);
-const maxBuffer = -1;
+const maxBuffer = 1024 * 100000;
 
 // tslint:disable-next-line: no-any
 const exec2JSON = async (cmd: string, options?: ExecOptions): Promise<any> => {
