@@ -16,7 +16,7 @@ const exec2JSON = async (cmd: string, options?: ExecOptions): Promise<any> => {
 
     try {
         const results = await execProm(cmd, { maxBuffer, ...options });
-        if (line.includes('sfdx automig:load') || line.includes('sf automig load') || line.includes('sf data upsert') || line.includes('sfdx force:data:bulk:upsert')) {
+        if (cmd.includes('sfdx automig:load') || cmd.includes('sf automig load') || cmd.includes('sf data upsert') || cmd.includes('sfdx force:data:bulk:upsert')) {
             // if the script didn't supply the concise line, make sure it's there.
             return fakeResults;
         }
