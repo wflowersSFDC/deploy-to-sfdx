@@ -11,7 +11,7 @@ const maxBuffer = 1024 * 100000;
 const exec2JSON = async (cmd: string, options?: ExecOptions): Promise<any> => {
     try {
         const results = await execProm(cmd, { maxBuffer, ...options });
-        return JSON.parse(JSON.stringify(stripColor(results.stdout.toString())));
+        return JSON.parse(stripColor(results.stdout.toString()));
     } catch (err) {
         console.log(err);
         return JSON.parse(stripColor(err.stdout));
