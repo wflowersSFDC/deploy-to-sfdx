@@ -45,7 +45,7 @@ const securityAssertions = (line: string): string => {
             `ERROR: Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`
         );
     }
-    if (line.startsWith('sfdx plugins:') || line.startsWith('sf plugins')) {
+    if ((line.startsWith('sfdx ')  || line.startsWith('sf ')) && line.includes('plugins:')) {
         throw new Error(
             `ERROR: You can't install your own plugins. Your command: ${line}`
         );
