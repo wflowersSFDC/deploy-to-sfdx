@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import * as fs from 'fs-extra';
+import logger from 'heroku-logger';
 
 // import logger from 'heroku-logger';
 
@@ -53,7 +54,11 @@ const securityAssertions = (line: string): string => {
     const shaneRegex = /file\s+upload/;
     const standardRegex = /create\s+file/;
 
+    logger.debug('OJIBOWA parse: '+ line);
+
     if (line.includes('file:upload') || line.includes('create:file') || shaneRegex.test(line) || standardRegex.test(line) ) {
+        logger.debug('OJIBOWA caught');
+
         throw new Error(
             `ERROR: You can't upload files. Your command: ${line}`
         );
@@ -104,7 +109,6 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
             `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`
         );
     }
-
 
     return line;
 };
