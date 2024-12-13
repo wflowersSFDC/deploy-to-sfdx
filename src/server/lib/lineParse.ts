@@ -46,7 +46,16 @@ const securityAssertions = (line: string): string => {
     }
     if (line.startsWith('sfdx plugins:') || line.startsWith('sf plugins')) {
         throw new Error(
-            `ERROR: You can't install your own plugins.  See /src/server/lib/hubAuth for currently installed plugins.  Your command: ${line}`
+            `ERROR: You can't install your own plugins. Your command: ${line}`
+        );
+    }
+
+    const shaneRegex = /file\s+upload/;
+    const standardRegex = /create\s+file/;
+
+    if (line.includes('file:upload') || line.includes('create:file') || shaneRegex.test(line) || standardRegex.test(line) ) {
+        throw new Error(
+            `ERROR: You can't upload files. Your command: ${line}`
         );
     }
 
