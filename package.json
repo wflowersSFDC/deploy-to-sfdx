@@ -7,7 +7,7 @@
         "node": "22.x"
     },
     "scripts": {
-        "build": "export NODE_OPTIONS=--openssl-legacy-provider; yarn build:client && yarn build:server",
+        "build": "yarn build:client && yarn build:server",
         "build:server": "tsc -b ./src/server",
         "build:client": "lwc-services build -m production",
         "heroku:dev:down": "heroku ps:scale web=0 orgbuilder=0 pooldrain=0 -a hosted-scratch-dev",
