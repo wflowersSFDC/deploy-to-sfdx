@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
 import * as fs from 'fs-extra';
-import logger from 'heroku-logger';
 
 // import logger from 'heroku-logger';
 
