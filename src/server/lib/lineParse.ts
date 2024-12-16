@@ -45,7 +45,8 @@ const securityAssertions = (line: string): string => {
             `ERROR: Commands can't contain -u...you can only execute commands against the default project the deployer creates--this is a multitenant sfdx deployer.  Your command: ${line}`
         );
     }
-    if ((line.startsWith('sfdx ')  || line.startsWith('sf ')) && line.includes('plugins:')) {
+
+    if (line.includes('plugins')) {
         throw new Error(
             `ERROR: You can't install your own plugins. Your command: ${line}`
         );
@@ -54,11 +55,7 @@ const securityAssertions = (line: string): string => {
     const shaneRegex = /file\s+upload/;
     const standardRegex = /create\s+file/;
 
-    logger.debug('OJIBOWA parse: '+ line);
-
     if (line.includes('file:upload') || line.includes('create:file') || shaneRegex.test(line) || standardRegex.test(line) ) {
-        logger.debug('OJIBOWA caught');
-
         throw new Error(
             `ERROR: You can't upload files. Your command: ${line}`
         );
