@@ -163,6 +163,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
         currentCommand: undefined
     };
     if (!isByoo(msgJSON)) {
+        console.log('this is not a byoo deploy');
         const displayResults = await getDisplayResults(`tmp/${msgJSON.deployId}`, output.mainUser.username);
         output = {
             ...output,
