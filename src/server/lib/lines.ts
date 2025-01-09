@@ -12,7 +12,8 @@ import { loginURL } from './loginURL';
 import { getSummary } from './getSummary';
 
 const getDisplayResults = async (path: string, username: string): Promise<SfdxDisplayResult> =>
-    (await exec2JSON(`sfdx force:org:display -u ${username} --json`, { cwd: path })).result as SfdxDisplayResult;
+    (await exec2JSON(`sf data get record --sobject ScratchOrgInfo --where "SIGNUPUSERNAME=${username}" --json`, { cwd: path })).result as SfdxDisplayResult;
+    // (await exec2JSON(`sfdx force:org:display -u ${username} --json`, { cwd: path })).result as SfdxDisplayResult;
 
 const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => {
     // get the lines we'll run
@@ -49,7 +50,6 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
         cdsPublish(output);
 
         const summary = getSummary(localLine, msgJSON);
-        logger.debug(`line summary-- ${summary}`);
 
         const commandResult: ClientResult = {
             commandStartTimestamp: new Date(),
@@ -59,6 +59,8 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
 
         try {
             if (localLine.includes('--json')) {
+                // lineResult =
+
                 let response = await exec2JSON(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
                 // returned a reasonable error but not a full-on throw
 
@@ -118,11 +120,10 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                     commandCompleteTimestamp: new Date()
                 });
             } else {
-                const rawResult = await exec2String(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
                 // run with string output only
                 output.commandResults.push({
                     command: localLine,
-                    raw: rawResult
+                    raw: await exec2String(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' })
                 });
             }
 
@@ -165,8 +166,8 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
         const displayResults = await getDisplayResults(`tmp/${msgJSON.deployId}`, output.mainUser.username);
         output = {
             ...output,
-            instanceUrl: displayResults.instanceUrl,
-            expirationDate: displayResults.expirationDate
+            instanceUrl: displayResults.LoginUrl,
+            expirationDate: displayResults.ExpirationDate
         };
         await Promise.all([cdsPublish(output), exec('sfdx force:auth:logout -p', { cwd: `tmp/${msgJSON.deployId}` })]);
     } else {
