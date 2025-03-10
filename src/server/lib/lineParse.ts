@@ -51,6 +51,12 @@ const securityAssertions = (line: string): string => {
         );
     }
 
+    if (line.includes('list')) {
+        throw new Error(
+            `ERROR: You can't list our orgs, shapes or snapshots. Your command: ${line}`
+        );
+    }
+
     const shaneRegex = /file\s+upload/;
     const standardRegex = /create\s+file/;
 
