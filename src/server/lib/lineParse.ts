@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import * as fs from 'fs-extra';
 
-// import logger from 'heroku-logger';
+import logger from 'heroku-logger';
 
 import { shellSanitize } from './shellSanitize';
 import { argStripper } from './argStripper';
@@ -29,11 +29,14 @@ const byooFilter = (line: string): boolean => {
 };
 
 const securityAssertions = (line: string): string => {
+     logger.debug(`OJIBOWA1 ${line}`);
+    
     if (!shellSanitize(line)) {
         throw new Error(
             `ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`
         );
     }
+
     if (!(line.startsWith('sfdx ') || line.startsWith('sf '))) {
         throw new Error(
             `ERROR: Commands must start with sfdx, sf or be comments (security, yo!).  Your command: ${line}`
@@ -52,6 +55,7 @@ const securityAssertions = (line: string): string => {
     }
 
     if (line.includes('list')) {
+        logger.debug(`OJIBOWA2 ${line}`);
         throw new Error(
             `ERROR: You can't list our orgs, shapes or snapshots. Your command: ${line}`
         );
@@ -61,6 +65,7 @@ const securityAssertions = (line: string): string => {
     const standardRegex = /create\s+file/;
 
     if (line.includes('file:upload') || line.includes('create:file') || shaneRegex.test(line) || standardRegex.test(line) ) {
+        logger.debug(`OJIBOWA1 ${line}`);
         throw new Error(
             `ERROR: You can't upload files. Your command: ${line}`
         );
