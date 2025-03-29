@@ -1,4 +1,4 @@
-process.env.GITHUB_USERNAME_WHITELIST = 'mshanemc';
+process.env.GITHUB_USERNAME_WHITELIST = 'SFDC-Assets';
 process.env.GITHUB_REPO_WHITELIST = 'notme/something';
 process.env.POOLCONFIG_URL = 'https://url.com';
 
@@ -15,12 +15,12 @@ const resp: PoolConfig[] = [{ lifeHours: 1, quantity: 1, repos: [{ username: 'te
 mockedGetPoolConfig.mockResolvedValue(resp);
 
 test('verifies username is whitelisted', async () => {
-    expect(process.env.GITHUB_USERNAME_WHITELIST).toBe('mshanemc');
+    expect(process.env.GITHUB_USERNAME_WHITELIST).toBe('SFDC-Assets');
     expect(await checkWhitelist('mshanemc', 'anyrepo')).toBe(true);
 });
 
 test('verifies username is not whitelisted', async () => {
-    expect(process.env.GITHUB_USERNAME_WHITELIST).toBe('mshanemc');
+    expect(process.env.GITHUB_USERNAME_WHITELIST).toBe('SFDC-Assets');
     expect(await checkWhitelist('notme', 'anyrepo')).toBe(false);
 });
 
