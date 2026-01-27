@@ -21,7 +21,7 @@ export default class TrialLoader extends LightningElement {
     } else if (data) {
       console.log(data);
       if (data.mainUser && data.mainUser.loginUrl) {
-        window.location.href = data.mainUser.loginUrl;
+        // window.location.href = data.mainUser.loginUrl;
       }
     }
   }
