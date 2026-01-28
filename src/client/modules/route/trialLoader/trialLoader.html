@@ -1,13 +1,291 @@
-<template>
-  <base-card>
-    <div class="trial-content">
-      <div class="slds-text-heading_medium">
-        We're setting up your Lightning Platform trial.
-      </div>
-      <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHdtaXhnY3J3YWs1emIzbjdieGZ4aHlwZjkzdjBpYjBlZWNwbWdoaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1GEATImIxEXVR79Dhk/giphy.gif" alt="loading cloud" />
-      <div class="slds-text-heading_medium">
-        You'll get an email shortly to login and reset your password for your new Platform Trial Salesforce environment. 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Platform Free Trial — Sign Up</title>
+  <style>
+    :root { --max: 1100px; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+      color: #111;
+      background: #fff;
+    }
+    header {
+      border-bottom: 1px solid #eee;
+      padding: 14px 16px;
+    }
+    header .wrap {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      background: #e9f3ff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+    }
+    main { padding: 28px 16px 40px; }
+    .wrap {
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    h1 { font-size: 30px; margin: 0 0 10px; }
+    .sub { color: #444; margin: 0 0 16px; }
+    .bullets {
+      margin: 16px 0 0;
+      padding: 0 0 0 18px;
+      color: #222;
+    }
+    .card {
+      border: 1px solid #e8e8e8;
+      border-radius: 14px;
+      padding: 18px;
+      background: #fff;
+      box-shadow: 0 6px 18px rgba(0,0,0,.05);
+    }
+    form { display: grid; gap: 12px; }
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 560px) {
+      .row2 { grid-template-columns: 1fr; }
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      color: #222;
+      margin: 0 0 6px;
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: #4c9fff;
+      box-shadow: 0 0 0 3px rgba(76,159,255,.2);
+    }
+    .help {
+      font-size: 12px;
+      color: #555;
+      margin-top: 4px;
+    }
+    .check {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 10px;
+      align-items: start;
+      font-size: 13px;
+      color: #222;
+    }
+    .check input { margin-top: 3px; }
+    .divider { height: 1px; background: #eee; margin: 8px 0; }
+    .captcha {
+      border: 1px dashed #cfcfcf;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 13px;
+      color: #444;
+      background: #fafafa;
+    }
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #0b5cab;
+      color: #fff;
+    }
+    button:hover { filter: brightness(.95); }
+    .fineprint {
+      font-size: 12px;
+      color: #555;
+      margin-top: 10px;
+    }
+    .required::after { content:" *"; color:#b30000; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <div class="logo">SF</div>
+      <div style="font-weight:700;">Platform Free Trial</div>
+      <div style="margin-left:auto;color:#444;font-size:13px;">
+        Questions? Talk to an expert: <strong>1-800-XXX-XXXX</strong>
       </div>
     </div>
-  </base-card>
-</template>
+  </header>
+
+  <main>
+    <div class="wrap grid">
+      <section>
+        <h1>Salesforce Platform — 30-day free trial</h1>
+        <p class="sub">No downloads, no software to install. Complete the form to start your trial.</p>
+
+        <ul class="bullets">
+          <li>Access to core platform features and APIs</li>
+          <li>Guided resources to help you get started</li>
+          <li>Support from our team during your trial</li>
+        </ul>
+
+        <p class="fineprint">
+          Note: Your free trial may be provisioned on or migrated to a public cloud infrastructure environment.
+        </p>
+      </section>
+
+      <aside class="card">
+        <h2 style="margin:0 0 10px;font-size:18px;">Start your free trial</h2>
+
+        <form action="#" method="post">
+          <div class="row2">
+            <div>
+              <label class="required" for="firstName">First name</label>
+              <input id="firstName" name="firstName" autocomplete="given-name" required />
+            </div>
+            <div>
+              <label class="required" for="lastName">Last name</label>
+              <input id="lastName" name="lastName" autocomplete="family-name" required />
+            </div>
+          </div>
+
+          <div>
+            <label class="required" for="jobTitle">Job title</label>
+            <input id="jobTitle" name="jobTitle" required />
+          </div>
+
+          <div>
+            <label class="required" for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </div>
+
+          <div>
+            <label class="required" for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" required />
+          </div>
+
+          <div>
+            <label class="required" for="company">Company</label>
+            <input id="company" name="company" autocomplete="organization" required />
+          </div>
+
+          <div>
+            <label class="required" for="employees">Employees</label>
+            <select id="employees" name="employees" required>
+              <option value="" selected disabled>Select the number of employees</option>
+              <option>1 - 10</option>
+              <option>11 - 20</option>
+              <option>21 - 99</option>
+              <option>100 - 199</option>
+              <option>200 - 499</option>
+              <option>500 - 999</option>
+              <option>1,000 - 1,999</option>
+              <option>2,000+</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="required" for="country">Country/Region</label>
+            <select id="country" name="country" required>
+              <option value="" selected disabled>Choose a valid country</option>
+              <option>United States</option>
+              <option>Canada</option>
+              <option>United Kingdom</option>
+              <option>Germany</option>
+              <option>India</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="state">State/Province</label>
+            <input id="state" name="state" />
+          </div>
+
+          <div class="divider"></div>
+
+          <div>
+            <label class="required" for="language">Company language</label>
+            <select id="language" name="language" required>
+              <option value="" selected disabled>Select company language</option>
+              <option>English</option>
+              <option>French</option>
+              <option>German</option>
+              <option>Spanish</option>
+              <option>Japanese</option>
+              <option>Korean</option>
+              <option>Portuguese (Brazil)</option>
+              <option>Chinese (Simplified)</option>
+              <option>Chinese (Traditional)</option>
+            </select>
+          </div>
+
+          <div class="divider"></div>
+
+          <label style="font-size:13px;font-weight:700;">Disclosures</label>
+
+          <div class="check">
+            <input id="msa" name="msa" type="checkbox" required />
+            <div>
+              <label class="required" for="msa" style="display:inline;margin:0;">I agree to the Main Services Agreement.</label>
+              <div class="help">This field is required.</div>
+            </div>
+          </div>
+
+          <div class="check">
+            <input id="mktg" name="mktg" type="checkbox" />
+            <div>
+              <label for="mktg" style="display:inline;margin:0;">Yes, I would like to receive marketing communications.</label>
+              <div class="help">You can unsubscribe at any time.</div>
+            </div>
+          </div>
+
+          <div class="check">
+            <input id="privacy" name="privacy" type="checkbox" required />
+            <div>
+              <label class="required" for="privacy" style="display:inline;margin:0;">I agree to the processing of my personal data as described in the Privacy Statement.</label>
+              <div class="help">This field is required.</div>
+            </div>
+          </div>
+
+          <div class="captcha" aria-label="captcha placeholder">
+            CAPTCHA placeholder (integrate reCAPTCHA/hCaptcha here)
+          </div>
+
+          <button type="submit">Start my free trial</button>
+
+          <p class="fineprint">
+            By registering, you confirm you’ve provided accurate information and agree to the disclosures above.
+          </p>
+        </form>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>
