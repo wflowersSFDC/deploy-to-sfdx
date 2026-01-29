@@ -14,6 +14,12 @@ export default class TrialLoader extends LightningElement {
     this._deployId = value;
   }
 
+  connectedCallback() {
+    window.location.replace(
+      'https://www.salesforce.com/form/signup/conf/freetrial-platform/'
+    );
+  }
+
   @wire(resultsPoll, { deployId: '$deployId' })
   wiredResults({ error, data }: { error: any; data: CDS }) {
     if (error) {
