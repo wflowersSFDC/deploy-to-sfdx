@@ -1,83 +1,9 @@
 <template>
-  <div class="trial-page">
-    <!-- Top header bar (simple approximation) -->
-    <header class="trial-header">
-      <div class="trial-header__inner">
-        <div class="trial-brand">
-          <div class="trial-brand__logo" aria-hidden="true">SF</div>
-          <div class="trial-brand__name">Agentforce 360 Platform</div>
-        </div>
-
-        <div class="trial-header__cta">
-          <span class="trial-header__ctaText">Questions? Talk to an expert:</span>
-          <span class="trial-header__ctaNumber">1-800-XXX-XXXX</span>
-        </div>
+  <base-card>
+    <div class="trial-content">
+      <div class="slds-text-heading_medium">
+        We're setting up your Agentforce 360 Platform trial.
       </div>
-    </header>
-
-    <main class="trial-main">
-      <div class="trial-container slds-grid slds-wrap slds-gutters_large">
-        <!-- Left hero column -->
-        <section class="slds-col slds-size_1-of-1 slds-large-size_7-of-12">
-          <div class="trial-hero">
-            <div class="trial-kicker">Salesforce Platform — 30-day free trial</div>
-
-            <h1 class="trial-hero__title">
-              We’re setting up your Agentforce 360 Platform trial.
-            </h1>
-
-            <p class="trial-hero__sub">
-              No downloads, no software to install. We’re provisioning your Salesforce environment now.
-            </p>
-
-            <div class="trial-hero__bulletsWrap">
-              <div class="trial-hero__bulletsTitle">With your trial, you get:</div>
-              <ul class="trial-hero__bullets">
-                <li>Access to core platform features and APIs</li>
-                <li>Guided resources to help you get started</li>
-                <li>Support during your trial</li>
-              </ul>
-            </div>
-
-            <p class="trial-hero__note">
-              Your trial may be provisioned on or migrated to a public cloud infrastructure environment.
-            </p>
-          </div>
-        </section>
-
-        <!-- Right card column -->
-        <section class="slds-col slds-size_1-of-1 slds-large-size_5-of-12">
-          <base-card>
-            <div class="trial-card">
-              <div class="trial-card__title slds-text-heading_small">
-                Start your free trial
-              </div>
-
-              <div class="trial-card__body">
-                <div class="trial-loader">
-                  <img
-                    class="trial-loader__img"
-                    src="https://a.sfdcstatic.com/content/dam/www/ocms-backup/common/assets/images/cloud.loader.gif"
-                    alt="Loading"
-                  />
-
-                  <div class="trial-loader__status slds-text-heading_medium">
-                    Provisioning your org…
-                  </div>
-
-                  <div class="trial-loader__copy">
-                    You’ll get an email shortly to log in and reset your password for your new Agentforce 360 Platform Trial Salesforce environment.
-                  </div>
-
-                  <div class="trial-loader__fineprint">
-                    Keep this tab open. When provisioning completes, you’ll be able to continue.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </base-card>
-        </section>
-      </div>
-    </main>
-  </div>
+    </div>
+  </base-card>
 </template>
