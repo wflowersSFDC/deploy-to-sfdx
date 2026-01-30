@@ -1,6 +1,6 @@
 .sf-trial-loader {
   position: fixed;
-  top: 48px;                /* controls how far from the top */
+  top: 96px;                /* controls how far from the top */
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
