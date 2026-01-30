@@ -1,25 +1,21 @@
 .sf-trial-loader {
-  min-height: 100vh;
-  width: 100vw;
-  background-color: #f4f6f9; /* Salesforce page gray */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  position: fixed;
   top: 48px;                /* controls how far from the top */
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
+
+  /* optional: constrain width for nicer appearance */
+  width: 100%;
+  max-width: 420px;
 }
 
-/* Content block */
 .sf-loader-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: 440px;
-  padding: 32px;
+  padding: 16px;
 }
 
 /* Spinner */
