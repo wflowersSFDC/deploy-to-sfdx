@@ -1,10 +1,21 @@
 <template>
-  <base-card>
-    <div class="trial-content">
-      <div class="slds-text-heading_medium">
-        We're setting up your Agentforce 360 Platform trial.
+  <div class="sf-trial-loader">
+    <base-card>
+      <div class="sf-loader-content">
+        <lightning-spinner
+          alternative-text="Setting things up"
+          size="medium"
+          variant="brand">
+        </lightning-spinner>
+
+        <h1 class="sf-heading">
+          Setting things up
+        </h1>
+
+        <p class="sf-body">
+          We’re preparing your Agentforce 36O Platform Free Trial<br />
+        </p>
       </div>
-      <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHdtaXhnY3J3YWs1emIzbjdieGZ4aHlwZjkzdjBpYjBlZWNwbWdoaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1GEATImIxEXVR79Dhk/giphy.gif" alt="loading cloud" />
-    </div>
-  </base-card>
+    </base-card>
+  </div>
 </template>
