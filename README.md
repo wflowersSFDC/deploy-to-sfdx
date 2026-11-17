@@ -8,6 +8,12 @@ Back end: nodejs/express/typescript + heroku buildpacks
 
 Test: jest
 
+The Heroku deployment targets the `heroku-26` Cedar stack and Node.js 22 LTS.
+Node is pinned in `package.json` so Heroku doesn't silently move this legacy
+LWC/Webpack build to a newer major runtime. The client build enables Node's
+legacy OpenSSL provider only while compiling the existing Webpack bundle; it is
+not enabled for running dynos.
+
 [Video explanation](https://youtu.be/gyGt386eAqw?t=1168) from May 2019 (TDX) (some things have changed, especially LWC instead of vue)
 
 ## Purpose
@@ -27,6 +33,22 @@ You have a dev hub, and an sfdx repo. You'd like to let people spin up scratch o
 Create a connected app for JWT auth, with certificates, per the SFDX setup guide.
 
 <https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_jwt_flow.htm>
+
+The hub integration uses the OAuth 2.0 JWT bearer flow. It does not use an
+authorization code or store a refresh token, so the Connected App can require
+PKCE and can rotate or expire refresh tokens without requiring a different hub
+authentication flow in this application.
+
+Configure the Connected App used by `HUB_USERNAME` as follows:
+
+- Keep **Use digital signatures** enabled with the certificate whose private
+  key is supplied in `JWTKEY` or `LOCAL_ONLY_KEY_PATH`.
+- Set **Permitted Users** to **Admin approved users are pre-authorized**.
+- Grant `HUB_USERNAME` access to the Connected App through a permission set or
+  profile. This avoids relying on a previous self-authorization approval that
+  can disappear when refresh tokens expire or are revoked.
+- Keep the required API OAuth scope. PKCE and refresh-token security policies
+  may remain enabled; they do not apply to the JWT bearer token request.
 
 ---
 
@@ -68,7 +90,21 @@ Here's a heroku button so you can have your own instance of the Deployer
 
 ## Heroku setup
 
-The button will start this on free hobby dynos. For real life, I'd recommend a pair of web 1x and a pair of workers (orgbuilder) at 1x.
+For an existing app, `app.json` doesn't change the stack automatically. Test
+the new stack in a review or staging app, then apply it to the existing app and
+redeploy:
+
+```shell
+heroku stack:set heroku-26 -a hosted-scratch
+git push heroku HEAD:main
+```
+
+The `app.json` stack setting applies to new Review Apps, Heroku CI apps, and
+apps created with the Heroku button.
+
+The button starts the web and org builder processes on Basic dynos. For higher
+traffic, use Standard or Performance dynos and scale the web and org builder
+processes according to demand.
 
 If you're going to be doing a lot of users (imagine a workshop where lots of people are pushing the button at the same time) you can scale out more workers so the people last in line don't have to wait so long. Otherwise, it'll spin while the workers are busy processing the deploy request queue.
 

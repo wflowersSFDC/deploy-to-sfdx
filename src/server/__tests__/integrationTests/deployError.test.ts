@@ -18,7 +18,7 @@ describe.skip('tests error handling', () => {
     test('fails to deploy a bad repo, with good error messages', async () => {
         jest.setTimeout(sfdxTimeout);
 
-        const browser = await puppeteer.launch({});
+        const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
         const page = await browser.newPage();
 
         const user = 'mshanemc';

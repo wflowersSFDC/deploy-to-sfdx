@@ -25,6 +25,15 @@ const getKeypath = async (): Promise<string> => {
     return undefined;
 };
 
+/**
+ * Hub authentication intentionally uses the OAuth 2.0 JWT bearer flow.
+ *
+ * Salesforce PKCE requirements apply to authorization-code flows, not JWT
+ * bearer grants. JWT bearer grants also issue no refresh token, so refresh
+ * token rotation and expiration policies do not require a different client
+ * implementation here. The Connected App must keep its certificate and must
+ * pre-authorize HUB_USERNAME through a profile or permission set.
+ */
 const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME): Promise<string> =>
     `sfdx force:auth:jwt:grant --clientid ${
         processWrapper.CONSUMERKEY

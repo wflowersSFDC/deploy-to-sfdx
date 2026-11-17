@@ -3,19 +3,20 @@
     "description": "An application that will deploy an SFDX project from a public Github repo",
     "repository": "https://github.com/SFDC-Assets/deploy-to-sfdx",
     "keywords": ["deploy", "sfdx", "salesforcedx"],
+    "stack": "heroku-26",
     "env": {
         "CONSUMERKEY": {
-            "description": "The consumer key for your Connected App.",
+            "description": "The consumer key for the certificate-enabled Connected App used by the JWT bearer flow.",
             "value": "",
             "required": true
         },
         "HUB_USERNAME": {
-            "description": "The username for your connected app",
+            "description": "The pre-authorized Dev Hub integration username for the Connected App JWT bearer flow.",
             "value": "",
             "required": true
         },
         "JWTKEY": {
-            "description": "The server.key file from your connected app",
+            "description": "The private key matching the certificate configured on the Connected App. No refresh token is stored.",
             "value": "",
             "required": true
         },
@@ -31,26 +32,26 @@
         }
     },
     "formation": {
-        "web": { "quantity": 1, "size": "free" },
-        "orgbuilder": { "quantity": 1, "size": "free" },
-        "pooldeployer": { "quantity": 0, "size": "free" },
-        "poolwatcher": { "quantity": 0, "size": "free" },
-        "oneoffbuilder": { "quantity": 0, "size": "free" },
-        "poolskimmer": { "quantity": 0, "size": "free" },
-        "dynoskimmer": { "quantity": 0, "size": "free" }
+        "web": { "quantity": 1, "size": "basic" },
+        "orgbuilder": { "quantity": 1, "size": "basic" },
+        "pooldeployer": { "quantity": 0, "size": "basic" },
+        "poolwatcher": { "quantity": 0, "size": "basic" },
+        "oneoffbuilder": { "quantity": 0, "size": "basic" },
+        "poolskimmer": { "quantity": 0, "size": "basic" },
+        "dynoskimmer": { "quantity": 0, "size": "basic" }
     },
     "buildpacks": [
         {
-            "url": "https://buildpack-registry.s3.amazonaws.com/buildpacks/jontewks/puppeteer.tgz"
+            "url": "jontewks/puppeteer"
         },
         {
             "url": "heroku/nodejs"
         },
         {
-            "url": "https://github.com/heroku/salesforce-cli-buildpack/tree/master"
+            "url": "https://github.com/heroku/salesforce-cli-buildpack"
         },
         {
-            "url": "https://github.com/heroku/heroku-buildpack-cli#ff0bfe609b4618be16b5e446d623d0eabc1576cb"
+            "url": "heroku-community/cli"
         }
     ],
     "addons": [
