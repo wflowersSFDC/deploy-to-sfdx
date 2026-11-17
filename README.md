@@ -90,6 +90,18 @@ Here's a heroku button so you can have your own instance of the Deployer
 
 ## Heroku setup
 
+Workers require Git at runtime to clone deployment repositories. `Aptfile`
+installs Git through the `heroku-community/apt` buildpack, listed first in
+`app.json`. For an existing app, add this buildpack before deploying this change
+(editing `app.json` alone does not update existing buildpacks):
+
+```shell
+heroku buildpacks:add --index 1 heroku-community/apt -a hosted-scratch
+```
+
+A rebuild is required; restarting existing dynos does not install Git. After
+deploying, verify the runtime with `heroku run 'git --version' -a hosted-scratch`.
+
 For an existing app, `app.json` doesn't change the stack automatically. Test
 the new stack in a review or staging app, then apply it to the existing app and
 redeploy:
