@@ -130,6 +130,56 @@ If you're using org pools, you also want to have scheduler running `poolwatcher`
 
 ---
 
+## Troubleshooting pool configuration
+
+### Authenticated platformmarketing pool reads
+
+To use the org's authenticated endpoint instead of the public Site, configure:
+
+```text
+POOLCONFIG_AUTH=jwt
+POOLCONFIG_URL=https://platformmarketing.my.salesforce.com/services/apexrest/pools/Production
+```
+
+JWT mode uses the existing pool-drain integration's `PD_USERNAME`,
+`PD_CONSUMERKEY` and `PD_KEY` credentials, separate from the Dev Hub credentials.
+The connected app must authorize this integration user for the `api` scope, and
+the user needs access to `poolsRestApi` and the records and fields it reads.
+Prefer a dedicated integration user with only the required permissions; this
+change does not alter the existing user's grants.
+
+Keep the private key in Heroku config, never in the repository. For local use,
+`PD_LOCAL_ONLY_KEY_PATH` can point to an external private-key file. The Dev Hub's
+`LOCAL_ONLY_KEY_PATH` is no longer used as a fallback for the pool-drain key.
+
+The app exchanges a short-lived RS256 assertion for an access token and sends
+it only to the matching authenticated Salesforce org. Redirects are disabled;
+authentication failures never fall back to anonymous access. Tokens and signed
+assertions are not logged. Unset `POOLCONFIG_AUTH` preserves anonymous behavior
+for existing installations; changing credentials alone does not enable JWT mode.
+
+On November 17, 2026, a read-only check from `hosted-scratch` using its existing
+pool-drain credentials successfully authenticated to platformmarketing and read
+161 pool definitions (HTTP 200) from the org endpoint. Its anonymous Site
+endpoint returned HTTP 500. The local code and configuration above must be
+deployed and enabled before regular pool reads use authentication.
+
+### Endpoint failures
+
+`POOLCONFIG_URL` must return a JSON array of pool definitions. A successful
+network connection is not enough: HTTP errors and invalid JSON prevent the
+pool watcher from preparing new orgs. The loader uses a 20-second timeout and
+reports the HTTP status and Salesforce error message without dumping the full
+request and response objects.
+
+The platformmarketing Production endpoint returned HTTP 500 on November 17,
+2026: `poolsRestApi.actualWork` (line 19) reported that `GitHub_Repo__c` was not
+available on `Demo__c`. This is an upstream endpoint failure. Check that class's
+query against the org's current field API names and the site's execution
+permissions. The endpoint's source is not included in this repository. Restore
+its valid JSON response before expecting pool replenishment to work; changing
+the Heroku buildpacks will not repair this query.
+
 ## Architectural overview
 
 Nodejs, express run the web server.

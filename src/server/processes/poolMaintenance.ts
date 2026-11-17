@@ -3,6 +3,7 @@ import { utilities } from '../lib/utilities';
 import { getPoolDeployRequestQueueSize } from '../lib/redisNormal';
 import { startPoolDeployers } from '../lib/poolPrep';
 import { prepareAll } from '../lib/poolPrep';
+import logger from 'heroku-logger';
 
 (async () => {
     if (utilities.checkHerokuAPI()) {
@@ -16,4 +17,7 @@ import { prepareAll } from '../lib/poolPrep';
         await startPoolDeployers(await getPoolDeployRequestQueueSize());
     }
     process.exit(0);
-})();
+})().catch((err) => {
+    logger.error('Pool maintenance failed', { errorMessage: err.message });
+    process.exit(1);
+});

@@ -6,6 +6,7 @@ import request from 'request-promise-native';
 import { PoolConfig, ProjectJSON, DeployRequest, DeployRequestRepo, PoolConfigDeprecated } from './types';
 import { filterUnsanitized } from './shellSanitize';
 import { processWrapper } from './processWrapper';
+import { readAuthenticatedPoolConfig } from './platformmarketingAuth';
 
 const randomCharactersInDeployId = 2;
 
@@ -106,14 +107,51 @@ const getPoolConfig = async (): Promise<PoolConfig[]> => {
     if (!processWrapper.POOLCONFIG_URL) {
         return [];
     }
-    const pools = JSON.parse(await request(processWrapper.POOLCONFIG_URL)) as PoolConfigDeprecated[];
+    let body: string;
+    const authMode = processWrapper.POOLCONFIG_AUTH || 'anonymous';
+    if (!['anonymous', 'jwt'].includes(authMode)) {
+        throw new Error('POOLCONFIG_AUTH must be anonymous or jwt');
+    }
+    if (authMode === 'jwt') {
+        body = await readAuthenticatedPoolConfig(processWrapper.POOLCONFIG_URL);
+    } else {
+        try {
+            body = await request({ uri: processWrapper.POOLCONFIG_URL, timeout: 20000 });
+        } catch (err) {
+            // Do not propagate the request object: it dumps headers, cookies and sockets.
+            let detail = err.code || err.cause?.code || 'Request failed';
+            try {
+                const errors = typeof err.error === 'string' ? JSON.parse(err.error) : err.error;
+                if (Array.isArray(errors) && typeof errors[0]?.message === 'string') {
+                    detail = `${errors[0].errorCode || 'Endpoint error'}: ${errors[0].message.split('\n')[0]}`;
+                }
+            } catch (_) {
+                // HTML and other non-JSON error responses still retain the HTTP status.
+            }
+            throw new Error(`Unable to load pool configuration from POOLCONFIG_URL${err.statusCode ? ` (HTTP ${err.statusCode})` : ''}: ${detail}`);
+        }
+    }
+    let pools: PoolConfigDeprecated[];
+    try {
+        pools = JSON.parse(body);
+    } catch (_) {
+        throw new Error('POOLCONFIG_URL did not return valid JSON');
+    }
+    if (!Array.isArray(pools)) {
+        throw new Error('POOLCONFIG_URL must return a JSON array of pool configurations');
+    }
     if (!processWrapper.SINGLE_REPO) {
         return pools.map((pool) => poolConversion(pool));
     }
     // single repo env config...ignore non-matching pools
     return pools
         .map((pool) => poolConversion(pool))
-        .filter((pool) => pool.repos.length === 1 && processWrapper.SINGLE_REPO.includes(`${pool.repos[0].repo}/${pool.repos[0].username}`));
+        .filter((pool) => {
+            const configuredRepo = processWrapper.SINGLE_REPO.replace(/^https:\/\/github.com\//i, '').split('/');
+            return pool.repos.length === 1 &&
+                configuredRepo[0].toLowerCase() === pool.repos[0].username.toLowerCase() &&
+                configuredRepo[1]?.replace(/\.git$/, '').toLowerCase() === pool.repos[0].repo.toLowerCase();
+        });
 };
 
 const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {

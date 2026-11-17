@@ -20,8 +20,8 @@ const processWrapper = {
     BYOO_CALLBACK_URI: process.env.BYOO_CALLBACK_URI,
 
     // poolDrain credentials
-    PD_KEY: process.env.LOCAL_ONLY_KEY_PATH
-        ? fs.readFileSync(process.env.LOCAL_ONLY_KEY_PATH)
+    PD_KEY: process.env.PD_LOCAL_ONLY_KEY_PATH
+        ? fs.readFileSync(process.env.PD_LOCAL_ONLY_KEY_PATH)
         : process.env.PD_KEY,
     PD_USERNAME: process.env.PD_USERNAME,
     PD_CONSUMERKEY: process.env.PD_CONSUMERKEY,
@@ -34,6 +34,7 @@ const processWrapper = {
     // org pool stuff
     maxPoolBuilders: process.env.maxPoolBuilders ? parseInt(process.env.maxPoolBuilders) : 50,
     POOLCONFIG_URL: process.env.POOLCONFIG_URL,
+    POOLCONFIG_AUTH: process.env.POOLCONFIG_AUTH,
 
     // heroku integration stuff
     HEROKU_APP_NAME: process.env.HEROKU_APP_NAME,
