@@ -4,7 +4,7 @@
 
 Front end: [LWC](lwc.dev)
 
-Back end: nodejs/express/typescript + heroku buildpacks
+Back end: Node.js/Express/TypeScript + Heroku buildpacks
 
 Test: jest
 
