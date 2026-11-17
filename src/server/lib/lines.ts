@@ -66,17 +66,11 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                 // returned a reasonable error but not a full-on throw
 
                 if (response.status !== 0) {
-                    // you fail!
-                    output.errors.push({
-                        command: localLine,
-                        error: response.message,
-                        raw: response
-                    });
-                    logger.error(
-                        `error running line ${localLine} from deploy that includes ${msgJSON.repos[0].username}/${msgJSON.repos[0].repo}: ${response.message}`,
-                        response
-                    );
+                    throw new Error(response.message || `Command failed with status ${response.status}`);
                 } else {
+                    if (summary === commandSummary.ORG_CREATE && (!response.result?.orgId || !response.result?.username)) {
+                        throw new Error('Scratch-org command returned success without an org ID and username. The CLI plugin may have hidden an underlying creation error.');
+                    }
                     if (summary === commandSummary.OPEN) {
                         response = utilities.urlFix(response);
                         output.mainUser.openPath = getArg(localLine, '-p') ?? getArg(localLine, '--path');
@@ -145,14 +139,14 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                 },
                 {
                     command: localLine,
-                    error: `${JSON.parse(e.stdout).name}: ${JSON.parse(e.stdout).message}`,
-                    raw: JSON.parse(e.stdout)
+                    error: `${e.name || 'Error'}: ${e.message || String(e)}`,
+                    raw: { name: e.name || 'Error', message: e.message || String(e) }
                 }
             );
-            cdsPublish(output);
+            await cdsPublish(output);
 
             // and throw so the requester can do the rest of logging to heroku logs and GA
-            throw new Error(e);
+            throw e;
         }
     } //end of the loop
 

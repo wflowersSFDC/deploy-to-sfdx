@@ -9,12 +9,25 @@ const maxBuffer = 1024 * 100000;
 
 // tslint:disable-next-line: no-any
 const exec2JSON = async (cmd: string, options?: ExecOptions): Promise<any> => {
+    let stdout: string;
     try {
         const results = await execProm(cmd, { maxBuffer, ...options });
-        return JSON.parse(stripColor(results.stdout.toString()));
+        stdout = results.stdout.toString();
     } catch (err) {
-        console.log(err);
-        return JSON.parse(stripColor(err.stdout));
+        try {
+            const result = JSON.parse(stripColor(String(err.stdout || '')));
+            if (result && typeof result === 'object' && result.status !== 0) {
+                return result;
+            }
+        } catch (_) {
+            // CLI startup failures often write plain text to stderr, not JSON.
+        }
+        throw new Error(stripColor(String(err.stderr || err.message || 'Command failed')).trim());
+    }
+    try {
+        return JSON.parse(stripColor(stdout));
+    } catch (_) {
+        throw new Error('Command completed without valid JSON output');
     }
 };
 

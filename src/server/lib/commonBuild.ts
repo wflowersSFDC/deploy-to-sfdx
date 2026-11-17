@@ -36,8 +36,13 @@ const build = async (msgJSON: DeployRequest): Promise<CDS> => {
     try {
         clientResult = await lineRunner(msgJSON, clientResult);
     } catch (e) {
-        logger.error('deployQueueCheck: Deployment error', msgJSON);
-        logger.error('deployQueueCheck: Deployment error', e);
+        const errorMessage = e.message || String(e);
+        logger.error('deployQueueCheck: Deployment error', { deployId: msgJSON.deployId, errorMessage });
+        clientResult.errors.push({ command: clientResult.currentCommand || 'deployment', error: errorMessage, raw: '' });
+        clientResult.complete = true;
+        clientResult.completeTimestamp = new Date();
+        clientResult.currentCommand = undefined;
+        await cdsPublish(clientResult);
     }
 
     await Promise.all([timesToGA(msgJSON, clientResult), fs.remove(`tmp/${msgJSON.deployId}`), putHerokuCDS(clientResult)]);

@@ -14,6 +14,19 @@ LWC/Webpack build to a newer major runtime. The client build enables Node's
 legacy OpenSSL provider only while compiling the existing Webpack bundle; it is
 not enabled for running dynos.
 
+The Salesforce CLI buildpack ships a standalone CLI with its own Node runtime;
+the `package.json` pin alone does not control it. `.profile` sets oclif's
+`node-custom` runtime to `/app/.heroku/node/bin/node`, so oclif-based CLIs use
+the app's Node 22 as well. In testing, the bundled Node 26 crashed while loading
+`sf-demo-utils` with `Cannot read properties of undefined (reading 'prototype')`.
+The same plugin loaded under Node 22, and the sfconnect scratch-create command
+successfully created a test org locally. That test org was deleted afterward.
+
+After deploying, compare `node --version` and `sf --version` in a dyno. Both
+should report Node 22. Command failures now preserve non-JSON CLI error output
+and mark deployment results complete with an error, rather than leaving the
+browser showing an indefinitely running command.
+
 [Video explanation](https://youtu.be/gyGt386eAqw?t=1168) from May 2019 (TDX) (some things have changed, especially LWC instead of vue)
 
 ## Purpose
