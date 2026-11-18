@@ -70,7 +70,7 @@ describe('org sign-in', () => {
 });
 
 describe('deployment results', () => {
-    it('shows completed org credentials, command details, and Heroku links', async () => {
+    it('shows completed org credentials and command details', async () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response(complete)));
         open('/#deploying/deployer/demo');
         await screen.findByText('Deployment complete');
@@ -78,7 +78,7 @@ describe('deployment results', () => {
         expect(screen.getByText('admin@example.com')).toBeTruthy();
         expect(screen.getByText('test-password')).toBeTruthy();
         expect(screen.getByRole('link', { name: 'Launch' }).getAttribute('href')).toBe('https://example.com/login');
-        expect(screen.getByRole('link', { name: 'Open App' })).toBeTruthy();
+        expect(screen.queryByRole('link', { name: 'Open App' })).toBeNull();
         fireEvent.click(screen.getByText('Deploy metadata'));
         expect(screen.getByText(/"status": 0/)).toBeTruthy();
     });

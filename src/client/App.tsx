@@ -2,13 +2,13 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { currentRoute, safeUrl, templates, templateUrl } from './navigation';
 import { useResults } from './useResults';
 
-function Card({ children }: { children: ReactNode }) {
-    return <section className="slds-card panel">{children}</section>;
+function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
+    return <section className={`slds-card panel ${className}`}>{children}</section>;
 }
 
-function LinkButton({ href, children, external = false }: { href?: string; children: ReactNode; external?: boolean }) {
+function LinkButton({ href, children, external = false, primary = false }: { href?: string; children: ReactNode; external?: boolean; primary?: boolean }) {
     const url = safeUrl(href);
-    return url ? <a className="slds-button slds-button_neutral" href={url} target={external ? '_blank' : undefined}
+    return url ? <a className={`slds-button ${primary ? "slds-button_brand" : "slds-button_neutral"}`} href={url} target={external ? '_blank' : undefined}
         rel={external ? 'noopener noreferrer' : undefined}>{children}</a> : null;
 }
 
@@ -117,29 +117,31 @@ function Deployment({ deployId, trial = false }: { deployId: string; trial?: boo
             window.location.assign(url.href);
         } catch (cause) { setDeleteError(cause instanceof Error ? cause.message : 'Deletion failed.'); setDeleting(false); }
     }
-    return <>
-        <Card><h2>{trial ? 'Setting things up' : results?.complete ? errors.length ? 'Deployment failed' : 'Deployment complete' : 'Deploying your project'}</h2>
-            {trial ? <p>We’re preparing your Agentforce 360 Platform Free Trial.</p> : <p className="deployment-id">{deployId}</p>}
+    return <div className={trial ? undefined : "deployment-layout"}>
+        <Card className={`deployment-status ${results?.complete ? errors.length ? "status-failed" : "status-complete" : "status-running"}`}><div className="status-heading"><span className="status-symbol" aria-hidden="true">{results?.complete ? errors.length ? "!" : "✓" : "↗"}</span><div><h2>{trial ? 'Setting things up' : results?.complete ? errors.length ? 'Deployment failed' : 'Deployment complete' : 'Deploying your project'}</h2>
+            {trial ? <p>We’re preparing your Agentforce 360 Platform Free Trial.</p> : <p className="deployment-id">{deployId}</p>}</div>{!trial && <span className="status-badge">{results?.complete ? errors.length ? "Needs attention" : "Ready to use" : "In progress"}</span>}</div>
             {!results?.complete && <><progress aria-label={`Deploying ${deployId}`} value={percent} max="100" /><p role="status">{results?.currentCommand ? 'Deployment in progress' : 'Waiting for deployment updates…'}</p></>}
             {error && <ErrorMessage>{error} <button className="slds-button slds-button_neutral" onClick={() => setRetry(n => n + 1)}>Retry</button></ErrorMessage>}
         </Card>
         {!!errors.length && <ErrorMessage><h2>An error occurred while deploying</h2>{errors.map((item, i) => <div key={i}><p>{item.error}</p><code>{item.command}</code></div>)}</ErrorMessage>}
-        {user?.loginUrl && <Card><h2>Your org is ready!</h2><p>DNS updates can take up to five minutes. If the org does not load, wait a few minutes and try again.</p>
-            <div className="actions"><LinkButton href={user.loginUrl} external>Launch</LinkButton>
+        <div className="deployment-columns"><div className="deployment-overview">
+        {user?.loginUrl && <Card className="org-access"><h2>Your org is ready!</h2><p>Use Launch for your first login. DNS updates can take up to five minutes.</p>
+            <div className="actions"><LinkButton href={user.loginUrl} external primary>Launch</LinkButton>
                 {!results?.isByoo && <button className="slds-button slds-button_destructive" disabled={deleting} onClick={deleteOrg}>{deleting ? 'Deleting…' : 'Delete'}</button>}</div>
             {results?.expirationDate && <p>Your org will expire on <strong>{results.expirationDate}</strong>.</p>}
             {deleteError && <ErrorMessage>{deleteError}</ErrorMessage>}
         </Card>}
-        {user?.password && <Card><h2>Org credentials</h2><p>Use Launch to sign in for the first time. These credentials can also be used for integrations and mobile apps.</p>
+        {user?.password && <Card className="credentials-card"><h2>Org credentials</h2><p>For integrations and mobile apps:</p>
             <dl><dt>Username</dt><dd>{user.username}</dd><dt>Password</dt><dd>{user.password}</dd></dl>
             <p>Sign in at <a href="https://test.salesforce.com/" target="_blank" rel="noopener noreferrer">test.salesforce.com</a>.</p>
         </Card>}
-        {results?.herokuResults?.map((app, i) => <Card key={i}><h2>{app.appName}</h2><div className="actions"><LinkButton href={app.openUrl} external>Open App</LinkButton><LinkButton href={app.dashboardUrl} external>Open in Heroku</LinkButton></div></Card>)}
+        </div><div className="deployment-activity">
         {results?.currentCommand && !results.complete && <Card><h2>Currently running</h2><code>{results.currentCommand}</code></Card>}
-        {!trial && <Card><h2>Completed commands</h2>{!commands.length ? <p>No commands have completed yet.</p> : <ol className="commands">{commands.map((item, i) => <li key={i}>
-            <details><summary>{item.summary || item.shortForm || item.command || 'Command output'}</summary><pre>{item.command}</pre>{item.raw !== undefined && <pre>{rawOutput(item.raw)}</pre>}</details>
+        {!trial && <Card className="activity-card"><div className="card-heading"><h2>Completed commands</h2><span className="count-badge">{commands.length}</span></div>{!commands.length ? <p>No commands have completed yet.</p> : <ol className="commands">{commands.map((item, i) => <li key={i}>
+            <details><summary><span className="command-check" aria-hidden="true">✓</span><span className="command-label">{item.summary || item.shortForm || item.command || 'Command output'}</span><span className="disclosure-arrow" aria-hidden="true">›</span></summary><pre>{item.command}</pre>{item.raw !== undefined && <pre>{rawOutput(item.raw)}</pre>}</details>
         </li>)}</ol>}</Card>}
-    </>;
+        </div></div>
+    </div>;
 }
 
 export default function App() {
@@ -164,5 +166,5 @@ export default function App() {
         case 'error': content = <Card><ErrorMessage>{route.query.get('msg') || 'Something went wrong.'}</ErrorMessage><p>Please <a href="https://www.platformdemos.com/s/contactsupport" target="_blank" rel="noopener noreferrer">contact support</a> for help.</p></Card>; break;
         default: content = <Card><h2>Page not found</h2><a href="/#home">Return home</a></Card>;
     }
-    return <><a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to content</a><header><a href="/#home" aria-label="Home"><img src="/resources/images/salesforce_cloud.png" alt="Salesforce" width="67" /></a><h1>Salesforce DX Public Deployer</h1></header><main id="main-content" tabIndex={-1}>{content}</main><footer>Salesforce DX Public Deployer</footer></>;
+    return <><a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to content</a><header><div className="brand"><a href="/#home" aria-label="Home"><img src="/resources/images/salesforce_cloud.png" alt="Salesforce" width="48" /></a><div><span className="brand-eyebrow">SALESFORCE DX</span><h1>Public Deployer</h1></div></div><a className="platform-link" href="https://platformdemos.com"><span aria-hidden="true">←</span> Back to Platform Demos</a></header><main id="main-content" tabIndex={-1}>{content}</main><footer><span>Salesforce DX Public Deployer</span></footer></>;
 }
