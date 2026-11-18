@@ -97,11 +97,11 @@ describe('deployment results', () => {
         await screen.findByText('Unable to delete this org. Please try again.');
         expect(fetch).toHaveBeenCalledWith('/delete', expect.objectContaining({ method: 'POST', body: '{"deployId":"demo"}' }));
     });
-    it('shows failed requests instead of silently spinning', async () => {
+    it('shows a reconnecting status for a temporary service outage', async () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response({}, 503)));
         open('/#deploying/deployer/demo');
-        await screen.findByText(/HTTP 503/);
-        expect(screen.getByRole('button', { name: 'Retry' })).toBeTruthy();
+        await screen.findByText('Reconnecting to deployment updates…');
+        expect(screen.queryByRole('alert')).toBeNull();
     });
     it('shows trial loading and surfaces trial errors', async () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response({ deployId: 'demo', complete: true, errors: [{ command: 'create', error: 'Trial unavailable' }] })));

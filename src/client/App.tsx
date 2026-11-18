@@ -94,7 +94,7 @@ function rawOutput(value: unknown) { return typeof value === 'string' ? value : 
 
 function Deployment({ deployId, trial = false }: { deployId: string; trial?: boolean }) {
     const [retry, setRetry] = useState(0);
-    const { results, error } = useResults(deployId, retry);
+    const { results, error, reconnecting } = useResults(deployId, retry);
     const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState('');
     // Preserve the existing trial handoff after the first valid status response.
@@ -120,7 +120,7 @@ function Deployment({ deployId, trial = false }: { deployId: string; trial?: boo
     return <div className={trial ? undefined : "deployment-layout"}>
         <Card className={`deployment-status ${results?.complete ? errors.length ? "status-failed" : "status-complete" : "status-running"}`}><div className="status-heading"><span className="status-symbol" aria-hidden="true">{results?.complete ? errors.length ? "!" : "✓" : "↗"}</span><div><h2>{trial ? 'Setting things up' : results?.complete ? errors.length ? 'Deployment failed' : 'Deployment complete' : 'Deploying your project'}</h2>
             {trial ? <p>We’re preparing your Agentforce 360 Platform Free Trial.</p> : <p className="deployment-id">{deployId}</p>}</div>{!trial && <span className="status-badge">{results?.complete ? errors.length ? "Needs attention" : "Ready to use" : "In progress"}</span>}</div>
-            {!results?.complete && <><progress aria-label={`Deploying ${deployId}`} value={percent} max="100" /><p role="status">{results?.currentCommand ? 'Deployment in progress' : 'Waiting for deployment updates…'}</p></>}
+            {!results?.complete && <><progress aria-label={`Deploying ${deployId}`} value={percent} max="100" /><p role="status">{reconnecting ? 'Reconnecting to deployment updates…' : results?.currentCommand ? 'Deployment in progress' : 'Waiting for deployment updates…'}</p></>}
             {error && <ErrorMessage>{error} <button className="slds-button slds-button_neutral" onClick={() => setRetry(n => n + 1)}>Retry</button></ErrorMessage>}
         </Card>
         {!!errors.length && <ErrorMessage><h2>An error occurred while deploying</h2>{errors.map((item, i) => <div key={i}><p>{item.error}</p><code>{item.command}</code></div>)}</ErrorMessage>}
