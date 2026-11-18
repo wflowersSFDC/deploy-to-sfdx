@@ -21,6 +21,8 @@ the app's Node 22 as well. In testing, the bundled Node 26 crashed while loading
 `sf-demo-utils` with `Cannot read properties of undefined (reading 'prototype')`.
 The same plugin loaded under Node 22, and the sfconnect scratch-create command
 successfully created a test org locally. That test org was deleted afterward.
+The app now implements the four `demoutil` commands internally and no longer
+installs that plugin. The runtime pin remains for the other legacy plugins.
 
 After deploying, compare `node --version` and `sf --version` in a dyno. Both
 should report Node 22. Command failures now preserve non-JSON CLI error output
@@ -329,6 +331,56 @@ So you need a target repo to deploy (see examples below). If your repo is simple
 But with an orgInit.sh file, you can list out all your sfdx commands and they'll be executed by the deployer. Remember, no bash metacharacters and only sfdx commands are allowed (We can't let anyone run any arbitrary command on our servers...security, yo!)
 
 That lets you create records, assign permsets, create users, install packages, run tests, generate passwords, and do anything you can do with an SFDX command
+
+### Built-in demo utilities in orgInit.sh
+
+The deployer handles these commands directly, with the same command names as
+[sf-demo-utils](https://github.com/wflowersSFDC/sf-demo-utils). No plugin installation
+is required. Standard Salesforce commands still run through the Salesforce CLI.
+
+```sh
+sf demoutil org create scratch -f config/project-scratch-def.json -d 7 -w 60 -p admin -e example.demo -s
+sf project deploy start
+sf demoutil user password set -g User -l User -p 'DemoPassword123!'
+sf org open -p /lightning/page/home
+```
+
+| Command | Supported flags | Behavior |
+| --- | --- | --- |
+| `sf demoutil org create scratch` | `-f/--definitionfile`, `-d/--durationdays`, `-w/--wait`, `-p/--userprefix`, `-e/--userdomain`, `-i/--clientid`, `-c/--noancestors`, `-n/--nonamespace`, `-s/--setdefaultusername`, `-a/--setalias` | Generates a username and creates the scratch org using the app's configured Dev Hub. Sets the deployment's project default org; repository aliases are accepted but ignored. |
+| `sf demoutil user password set` | `-g/--firstname`, `-l/--lastname`, `-p/--password` | Sets the password for exactly one matching user in the deployment org. First and last name default to `User`. |
+| `sf demoutil tsp update` | `-d/--directory` | Replaces `user` and `executionUser` in transaction security policies with the deployment username. |
+| `sf demoutil agent userupdate` | `-d/--directory` | Finds exactly one user with the `Einstein Agent User` profile and updates `botUser` in Einstein Service Agent bot files recursively. |
+
+All four accept `--json`; the app adds it automatically. Colon-style names such as
+`sfdx demoutil:tsp:update` are also accepted. Scratch creation defaults to
+`config/user.definition.json`, 7 days, and a 20-minute wait. Metadata commands
+default to `force-app/main/default`; run them before deploying the affected metadata.
+Paths are relative to the repository and must stay inside the deployment checkout.
+Multi-repository deployments adjust these paths automatically and create one shared org.
+
+Put each command on its own line. Quoted argument values may contain spaces and
+literal punctuation; shell expansion, pipes, redirection, and chained commands
+are unsupported for built-in commands, including in whitelisted repositories.
+Unknown commands or flags fail explicitly. Bring-your-own-org deployments skip
+scratch creation and password commands, as before.
+
+Username generation replaces the external
+[unique-username-generator](https://github.com/SFDC-Assets/unique-username-generator)
+service. It combines the requested prefix and domain (defaults: `user` and
+`example.com`) with cryptographic randomness and an atomic Redis sequence shared
+by workers. It uses the app's existing Redis connection; no separate Heroku app,
+Memcached service, or public username endpoint is needed. Usernames are lowercased
+and validated against the 80-character limit. The exact random format differs
+from the old service.
+
+Native handlers use standard CLI commands for scratch creation, user queries, and
+the password REST request. They use the deployment org's CLI authentication and
+require a CLI version with `sf api request rest`. Password request bodies are
+written to a restricted temporary file and removed after the request. Deployment
+results continue to include the configured demo password for the requesting user.
+Failures stop the deployment and appear in its results; metadata writes finish
+before the next command starts.
 
 ## Private repos
 

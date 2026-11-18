@@ -5,7 +5,9 @@ import { DeployRequest, SfdxDisplayResult } from './types';
 import { utilities } from './utilities';
 import { getArg, isByoo } from './namedUtilities';
 import { lineParse } from './lineParse';
-import { cdsPublish, deleteOrg } from './redisNormal';
+import { cdsPublish, deleteOrg, redis } from './redisNormal';
+import { isDemoCommand } from './demoUtils/command';
+import { executeDemoCommand } from './demoUtils';
 import { exec, exec2JSON, exec2String } from './execProm';
 import { CDS, commandSummary, HerokuResult, ClientResult, ClientError } from './CDS';
 import { loginURL } from './loginURL';
@@ -38,14 +40,14 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
     // remove the open line(s) for pools and put them on the CDS
     if (msgJSON.pool) {
         output.poolLines = {
-            openLine: lines.find((line) => line.includes('org:open'))
+            openLine: lines.find((line) => line.includes('org:open') || line.includes('sf org open'))
         };
-        lines = lines.filter((line) => !line.includes('org:open'));
+        lines = lines.filter((line) => !line.includes('org:open') && !line.includes('sf org open'));
     }
     logger.debug('starting the line runs');
 
     for (const localLine of lines) {
-        logger.debug(`running line-- ${localLine}`);
+        logger.debug(isDemoCommand(localLine) ? 'running built-in demoutil command' : `running line-- ${localLine}`);
         // show what's currently running in the UI before it actually runs
         output.currentCommand = localLine;
         cdsPublish(output);
@@ -59,10 +61,15 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
         };
 
         try {
-            if (localLine.includes('--json')) {
+            if (isDemoCommand(localLine) || localLine.includes('--json')) {
                 // lineResult =
 
-                let response = await exec2JSON(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
+                let response = isDemoCommand(localLine)
+                    ? await executeDemoCommand(localLine, {
+                        cwd: `tmp/${msgJSON.deployId}`, hubUsername: processWrapper.HUB_USERNAME,
+                        targetOrg: output.mainUser.username, counter: redis
+                    })
+                    : await exec2JSON(localLine, { cwd: `tmp/${msgJSON.deployId}`, shell: '/bin/bash' });
                 // returned a reasonable error but not a full-on throw
 
                 if (response.status !== 0) {

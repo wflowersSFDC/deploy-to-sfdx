@@ -1,11 +1,25 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable no-use-before-define */
 import { exec2String, exec2JSON } from '../lib/execProm';
+import { isDemoCommand, parseDemoCommand } from './demoUtils/command';
+import path from 'path';
 
 const standardFlags = ['json', 'loglevel', 'targetusername', 'verbose', 'apiversion', 'targetdevhubusername', 'wait'];
 const fileFlags = ['filepath', 'directory'];
 
 const commandRewriter = async (filepath: string, command: string, flagsWeCareAbout?: CommandResult[]) => {
+    if (isDemoCommand(command)) {
+        const { method, flags } = parseDemoCommand(command);
+        const fileFlag = method === 'org create scratch' ? 'definitionfile' :
+            method === 'user password set' ? undefined : 'directory';
+        if (fileFlag) {
+            const fallback = fileFlag === 'definitionfile' ? 'config/user.definition.json' : 'force-app/main/default';
+            flags[fileFlag] = path.join(filepath, String(flags[fileFlag] || fallback));
+        }
+        const quote = (value: string) => `'${value.replace(/'/g, "'\\''")}'`;
+        return `sf demoutil ${method}${Object.entries(flags).map(([key, value]) =>
+            ` --${key}${value === true ? '' : `=${quote(String(value))}`}`).join('')}`;
+    }
     if (!flagsWeCareAbout) {
         flagsWeCareAbout = await getCommandsWithFileFlagsMap();
     }

@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+jest.mock('../../lib/execProm', () => ({ exec2JSON: jest.fn().mockResolvedValue([]) }));
 
 // import { testRepos } from '../helpers/testRepos';
 import {

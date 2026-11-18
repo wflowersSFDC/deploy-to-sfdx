@@ -8,8 +8,10 @@ import { argStripper } from './argStripper';
 import { DeployRequest } from './types';
 import { isMultiRepo, isByoo, getPackageDirsFromFile, getArg } from './namedUtilities';
 import { filesToLines } from './fileToLines';
+import { isDemoCommand, parseDemoCommand } from './demoUtils/command';
 
 const jsonify = (line: string): string => {
+    if (isDemoCommand(line)) return parseDemoCommand(line).flags.json ? line : `${line} --json`;
     if (line.startsWith('sfdx ') || line.startsWith('sf ')) {
         // TODO: handling for & at the end of line for background runs
         return `${argStripper(line, '--json', true)} --json`;
@@ -29,6 +31,10 @@ const byooFilter = (line: string): boolean => {
 };
 
 const securityAssertions = (line: string): string => {    
+    if (isDemoCommand(line)) {
+        parseDemoCommand(line); // Arguments are parsed and dispatched internally, never interpreted by a shell.
+        return line;
+    }
     if (!shellSanitize(line)) {
         throw new Error(
             `ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`
@@ -72,6 +78,10 @@ const securityAssertions = (line: string): string => {
 
 // corrections and improvements for individual commands, always runs
 const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
+    if (isDemoCommand(line)) {
+        parseDemoCommand(line);
+        return line;
+    }
     // we ALWAYS want -r instead of real open on our server
     if ((line.includes('sfdx force:org:open') || line.includes('sf org open')) && !line.includes(' -r')) {
         return `${line} -r`;
@@ -116,29 +126,25 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
     return line;
 };
 
-const thereCanBeOnlyOne = (lines: string[], textSoSearchFor: string) => {
-    const passwordLines = lines.filter((line) => line.includes(textSoSearchFor));
-
-    if (passwordLines.length > 1) {
-        const firstOccurence = lines.findIndex((line) => line.includes(textSoSearchFor));
-        return [
-            ...lines.slice(0, firstOccurence + 1), // start until the first occurrence, inclusive
-            ...lines.slice(firstOccurence + 2).filter((line) => !line.includes(textSoSearchFor)) // and none of the occurrences after that
-        ];
-    } else {
-        return lines;
-    }
+const multiOrgCorrections = (lines: string[]): string[] => {
+    let passwordSeen = false;
+    return lines.filter((line) => {
+        const password = isDemoCommand(line) ? parseDemoCommand(line).method === 'user password set' :
+            /user(?::|\s+)password/.test(line);
+        if (!password) return true;
+        if (passwordSeen) return false;
+        passwordSeen = true;
+        return true;
+    });
 };
-
-const multiOrgCorrections = (lines: string[]): string[] =>
-    // only one password allowed for (multi org).  [BYOO will have them already removed at this stage]
-    thereCanBeOnlyOne(lines, 'user password');
 const getMaxDays = (lines: string[]): number =>
     Math.max(
         ...lines
             .filter((line) => (line.includes('org:create') || line.includes('org create')))
             .map(
                 (line) =>
+                    isDemoCommand(line) ? Number(parseDemoCommand(line).flags.durationdays || 7) :
+                    parseInt(getArg(line, '-y'), 10) || parseInt(getArg(line, '--duration-days'), 10) ||
                     parseInt(getArg(line, '-d'), 10) || parseInt(getArg(line, '--days'), 10) || 7
             )
     );
@@ -170,10 +176,10 @@ const lineParse = async (msgJSON: DeployRequest): Promise<string[]> => {
     if (!isByoo(msgJSON) && isMultiRepo(msgJSON)) {
         // remove all the creates and put it at the beginning
         parsedLines = [
-            `sf org create scratch -f config/project-scratch-def.json -d ${getMaxDays(
+            `sf demoutil org create scratch -f config/project-scratch-def.json -d ${getMaxDays(
                 parsedLines
             )} -s --json`,
-            ...parsedLines.filter((line) => !line.includes('org create'))
+            ...parsedLines.filter((line) => !line.includes('org create') && !line.includes('org:create'))
         ];
     }
 
