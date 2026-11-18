@@ -2,34 +2,43 @@
 
 [![npm version](https://badge.fury.io/js/shane-sfdx-plugins.svg)](https://badge.fury.io/js/shane-sfdx-plugins)
 
-Front end: [LWC](lwc.dev)
+Front end: React + TypeScript, built with Vite
 
 Back end: Node.js/Express/TypeScript + Heroku buildpacks
 
 Test: jest
 
 The Heroku deployment targets the `heroku-26` Cedar stack and Node.js 22 LTS.
-Node is pinned in `package.json` so Heroku doesn't silently move this legacy
-LWC/Webpack build to a newer major runtime. The client build enables Node's
-legacy OpenSSL provider only while compiling the existing Webpack bundle; it is
-not enabled for running dynos.
+Node is pinned in `package.json` so Heroku doesn't silently move the app to a
+newer major runtime. The React frontend uses Vite and no longer requires the
+legacy Webpack OpenSSL compatibility flag.
 
 The Salesforce CLI buildpack ships a standalone CLI with its own Node runtime;
-the `package.json` pin alone does not control it. `.profile` sets oclif's
-`node-custom` runtime to `/app/.heroku/node/bin/node`, so oclif-based CLIs use
-the app's Node 22 as well. In testing, the bundled Node 26 crashed while loading
-`sf-demo-utils` with `Cannot read properties of undefined (reading 'prototype')`.
-The same plugin loaded under Node 22, and the sfconnect scratch-create command
-successfully created a test org locally. That test org was deleted afterward.
-The app now implements the four `demoutil` commands internally and no longer
-installs that plugin. The runtime pin remains for the other legacy plugins.
+the `package.json` pin controls the web app and workers, not that bundled runtime.
+The CLI can use Node 26. `.profile` removes the Node 22 override created by older
+app releases and leaves unrelated custom runtime settings alone. The buildpack
+determines the bundled CLI runtime; this change does not install Node 26 itself.
 
-After deploying, compare `node --version` and `sf --version` in a dyno. Both
-should report Node 22. Command failures now preserve non-JSON CLI error output
+The app implements the four `demoutil` commands internally. Remaining legacy
+plugins use a Yarn resolution for `jwa@1.4.2`, whose upstream fix uses native
+constant-time signature comparison instead of loading the obsolete `SlowBuffer`
+code on modern Node. Keep this resolution when refreshing dependencies.
+
+After deploying, `node --version` should still report Node 22; `sf --version`
+reports the CLI's independent runtime. Local compatibility checks passed with
+CLI 2.142.7 on Node 26.13.1, including command discovery, help for all four linked
+plugins, scratch-create/REST help, and valid/invalid JWT signatures. These checks
+do not create orgs or validate a live deployment. To repeat with a chosen Node:
+
+```sh
+/path/to/node26 scripts/check-cli-runtime.cjs /path/to/sf/bin/run.js
+```
+
+Command failures preserve non-JSON CLI error output
 and mark deployment results complete with an error, rather than leaving the
 browser showing an indefinitely running command.
 
-[Video explanation](https://youtu.be/gyGt386eAqw?t=1168) from May 2019 (TDX) (some things have changed, especially LWC instead of vue)
+[Historical video explanation](https://youtu.be/gyGt386eAqw?t=1168) from May 2019 (TDX). The current frontend uses React.
 
 ## Purpose
 
@@ -286,7 +295,7 @@ in your `.env` add
 -   `LOCAL_ONLY_KEY_PATH=/Users/shane.mclaughlin/code/certificates/server.key` or your equivalent to where your cert for jwt is
 -   in your `process.env` file, put the Heroku Redis url (it can be the same as you're using in the cloud. **Don't commit this file to your repo.**
 -   `yarn install` will get all your modules installed, including my plugin.
--   `yarn build` will get the typescript and LWC output from /src to /built, which is where the executables go.
+-   `npm run build` compiles the React frontend into `dist/` and the TypeScript backend into `lib/server/`.
 -   then start this app with `yarn local:web` and use localhost:8443
 
 ## Building for Local Dev
@@ -294,8 +303,10 @@ in your `.env` add
 Backend:
 `npx nodemon` will recompile all your typescript and restart the local web and worker servers.
 
-Frontend (LWC):
-`yarn watch:client` will start a server on localhost:3001. It'll rebuild and hotswap anytime you save a file.
+Frontend (React):
+`npm run watch:client` starts Vite on localhost:5173. API requests are proxied to
+localhost:8443; set `CLIENT_API_ORIGIN` to use a different backend address. React
+pages rebuild on save. `npm run build:client` creates the production assets.
 
 Running both is good if you're working both front and backend
 
@@ -423,7 +434,21 @@ I'm using typescript...
 -   `yarn install` will get all your modules installed, including my plugins.
 -   `yarn build` will get any typescript changes from /src to /built, which is where the executables go.
 
-Finally, the front end app is Lightning Web Components. You'll figure it out...if not, start here: [https://lwc.dev/](https://lwc.dev/)
+The frontend is React and TypeScript in `src/client/`. `App.tsx` implements the
+eight existing routes, including hash links such as `/#deploying/deployer/:deployId`
+and direct paths served by Express. `useResults.ts` polls the existing results
+endpoint, cancels requests on navigation, and stops on completion or after 30
+minutes. Trial routes retain the Salesforce confirmation-page handoff after the
+first valid response. The UI preserves Salesforce Design System styling.
+The frontend uses TypeScript 5 through the `typescript-client` package alias;
+the backend retains TypeScript 4.9 for compatibility with its existing Jest tooling.
+
+Run `npm run test:client` for frontend tests. These cover routes, forms, sign-in
+links, progress, errors, credentials, deletion requests, and polling cleanup.
+Static images and favicons live in `src/client/public/resources/`, which Vite
+copies into `dist/resources/`. Express continues to serve `dist/`; the API and
+worker processes do not depend on React. No LWC runtime or LWC build tooling is
+needed by the frontend.
 
 ---
 

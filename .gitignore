@@ -44,6 +44,12 @@ process.env
 
 # Generated files and dirs
 public
+!/src/client/public/
+!/src/client/public/**
+
+# Browser verification artifacts
+output/playwright/
+.playwright-cli/
 
 # Local resources
 tmp

@@ -1,10 +1,19 @@
 {
     "parser": "@typescript-eslint/parser",
-    "plugins": ["prettier", "@typescript-eslint"],
-    "extends": ["@salesforce/eslint-config-lwc/recommended", "prettier"],
+    "plugins": [
+        "prettier",
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
+    ],
     "overrides": [
         {
-            "files": ["src/server/**"],
+            "files": [
+                "src/server/**"
+            ],
             "env": {
                 "node": true
             }

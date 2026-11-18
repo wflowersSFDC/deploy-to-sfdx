@@ -5,11 +5,11 @@ echo ".Profile: Updating PATH to include Salesforce CLI ..."
 export PATH=$PATH:/app/.local/share/sfdx/cli/bin/
 
 # Standalone oclif CLIs bundle their own Node, independently of package.json.
-# Use the app's pinned runtime so legacy Salesforce plugins load consistently.
-if [ -x /app/.heroku/node/bin/node ]; then
-    deployer_oclif_node_dir="${XDG_DATA_HOME:-$HOME/.local/share}/oclif/node"
-    mkdir -p "$deployer_oclif_node_dir"
-    ln -sf /app/.heroku/node/bin/node "$deployer_oclif_node_dir/node-custom"
+# Use the CLI's bundled runtime (including Node 26), not the web app's Node 22.
+# Remove only the override created by older releases of this app.
+deployer_oclif_node="${XDG_DATA_HOME:-$HOME/.local/share}/oclif/node/node-custom"
+if [ -L "$deployer_oclif_node" ] && [ "$(readlink "$deployer_oclif_node")" = /app/.heroku/node/bin/node ]; then
+    rm "$deployer_oclif_node"
 fi
 
 export SFDX_TOOL=platformdemos
